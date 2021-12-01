@@ -14,3 +14,14 @@ class Phoxi:
 
 	def capture(self):
 		return self.cam.read()
+
+	def net_capture(self):
+		return prepare_phoxi_image_for_net(self.capture())
+
+
+def prepare_phoxi_image_for_net(im):
+	im = im._data
+	im = np.copy(im[:,:,1:])
+	im[:,:,:2] /= 255
+	returm im
+
