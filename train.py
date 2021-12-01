@@ -32,8 +32,6 @@ def main():
     dataset = KPDataset()
     dataset_val = KPDataset(val=True)
 
-    import IPython; IPython.embed()
-    assert 0
 
     im = dataset[1]
     batch_size = 6
