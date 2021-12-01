@@ -27,8 +27,8 @@ class KPDataset:
         target = np.load(osp.join(self.dataset_dir, target_file))[np.newaxis,:,:]
 
         if self.val:
-            return ptu.torchify(im)[:,:100,:100]
-        return ptu.torchify(im[:,:100,:100], target[:,:100,:100])
+            return ptu.torchify(im)
+        return ptu.torchify(im, target)
 
 
     def __len__(self):
