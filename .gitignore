@@ -1,0 +1,7 @@
+preds
+train_sets
+checkpoints
+data
+__pycache__
+PhotoneoLogFiles
+venv
