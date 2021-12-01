@@ -1,7 +1,7 @@
 from autolab_core import RigidTransform
 import numpy as np
 import matplotlib.pyplot as plt
-from src.phoxi import Phoxi
+from fcvision.phoxi import Phoxi
 import os
 import os.path as osp
 import time

@@ -10,11 +10,11 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.dataset import KPDataset
-from src.model import PlModel
-from src.arg_utils import parse_args
+from fcvision.dataset import KPDataset
+from fcvision.model import PlModel
+from fcvision.arg_utils import parse_args
 # from torchvision import models
-import src.run_utils as ru
+import fcvision.run_utils as ru
 
 
 

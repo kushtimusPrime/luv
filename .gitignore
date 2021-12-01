@@ -3,6 +3,7 @@ outputs
 train_sets
 checkpoints
 data
+models
 __pycache__
 PhotoneoLogFiles
 venv

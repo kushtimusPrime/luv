@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import os.path as osp
-import src.pytorch_utils as ptu
+import fcvision.pytorch_utils as ptu
 
 
 import torch

@@ -2,7 +2,7 @@ from autolab_core import RigidTransform
 import numpy as np
 from phoxipy.phoxi_sensor import PhoXiSensor
 import matplotlib.pyplot as plt
-from src.phoxi import Phoxi
+from fcvision.phoxi import Phoxi
 
 if __name__ == '__main__':
 	cam = Phoxi()
