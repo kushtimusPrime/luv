@@ -32,8 +32,11 @@ def main():
     dataset = KPDataset()
     dataset_val = KPDataset(val=True)
 
+    import IPython; IPython.embed()
+    assert 0
+
     im = dataset[1]
-    batch_size = 2
+    batch_size = 6
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(dataset_val, batch_size=12, num_workers=params['loader_n_workers'])
 
@@ -48,37 +51,6 @@ def main():
     )
     trainer.fit(model, loader, loader_val)
 
-
-    # total_iters = 100000
-    # iters = 0
-    # while iters < total_iters:
-    #     for i_batch, (imgs_left, imgs_right, keypoints) in enumerate(loader):
-    #         # print_mem_usage()
-    #         if iters > total_iters:
-    #             break
-    #
-    #         # print(i_batch, imgs_right.shape, imgs_left.shape, keypoints.shape)
-    #
-    #         encoding = stereo_backbone(imgs_left, imgs_right)
-    #         keypoints = keypoint_head(encoding)
-    #
-    #         # print(encoding.shape)
-    #
-    #         # print(set(encoding))
-    #         # for key in encoding:
-    #         #    print(key, encoding[key].shape)
-    #
-    #         # TODO Forward pass through network
-    #         # TODO: NOTE: some of the keypoints will be NAN (for datapoints where the needle
-    #         #  was oriented such that it couldnt see all of the keypoints)
-    #         #  be sure to account for that
-    #
-    #         # TODO Compute loss/backward pass/gradient step
-    #
-    #         if iters % 10 == 0:
-    #             print(iters)
-
-            # iters += 1
 
 
 if __name__ == '__main__':
