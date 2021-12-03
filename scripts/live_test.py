@@ -33,7 +33,7 @@ def main():
 		fig.add_axes(ax)
 		ax.imshow(np_im, aspect='auto')
 		for xx, yy in coords:
-			circ = Circle((yy, xx), 10, color='r')
+			circ = Circle((yy, xx), 3, color='r')
 			ax.add_patch(circ)
 		plt.savefig(osp.join(logdir, "vis", "pred_%d.jpg"%idx))
 		plt.show()
