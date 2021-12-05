@@ -7,9 +7,5 @@ from fcvision.phoxi import Phoxi
 if __name__ == '__main__':
 	cam = Phoxi()
 	img = cam.capture()._data
-	print(img.shape)
 	for i in range(4):
 		plt.imshow(img[:,:,i]); plt.show()
-
-	
-
