@@ -3,7 +3,7 @@ import numpy as np
 import os.path as osp
 import fcvision.pytorch_utils as ptu
 
-
+from PIL import Image
 import torch
 from torch.utils.data import Dataset
 import torchvision.transforms.functional as TF
@@ -53,6 +53,37 @@ class KPDataset:
         new_im[1:] = im
         im = new_im
         target_file = im_file.replace("image", "target")
+        target = np.load(osp.join(self.dataset_dir, target_file))[np.newaxis,:,:]
+
+        im, target = target_transforms(im, target)
+
+        if self.val:
+            return ptu.torchify(im)
+        return ptu.torchify(im, target)
+
+
+    def __len__(self):
+        return len(self.datapoints)
+
+class StereoSegDataset:
+
+    def __init__(self, dataset_dir="data/cable_uv_images_processed", val=False):
+        self.dataset_dir = dataset_dir
+        self.datapoints = [f for f in os.listdir(self.dataset_dir) if ("image" in f and not "uv" in f)]
+        self.val = val
+        if self.val:
+            self.datapoints = self.datapoints[:10]
+        else:
+            self.datapoints = self.datapoints[10:]
+
+
+    def __getitem__(self, idx):
+        im_file = self.datapoints[idx]
+        im = np.array(Image.open(osp.join(self.dataset_dir, im_file)))
+        im = np.transpose(im, (2, 0, 1))
+        # im = np.load(osp.join(self.dataset_dir, im_file))
+        target_file = im_file.replace("image", "mask")
+        target_file = target_file.replace(".png", ".npy")
         target = np.load(osp.join(self.dataset_dir, target_file))[np.newaxis,:,:]
 
         im, target = target_transforms(im, target)

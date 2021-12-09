@@ -10,7 +10,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fcvision.dataset import KPDataset
+from fcvision.dataset import KPDataset, StereoSegDataset
 from fcvision.model import PlModel
 from fcvision.arg_utils import parse_args
 # from torchvision import models
@@ -29,11 +29,13 @@ def main():
         pl.seed_everything(params['seed'])
         np.random.seed(params['seed'])
 
-    dataset = KPDataset()
-    dataset_val = KPDataset(val=True)
+    # dataset = KPDataset()
+    # dataset_val = KPDataset(val=True)
+
+    dataset = StereoSegDataset()
+    dataset_val = StereoSegDataset(val=True)
 
 
-    im = dataset[1]
     batch_size = 6
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(dataset_val, batch_size=12, num_workers=params['loader_n_workers'])
