@@ -97,7 +97,7 @@ def get_segmasks(img_left, img_right, plot=False):
 
 
 def main():
-    data_dir = osp.join("data", "cable_uv_images")
+    data_dir = osp.join("data", "cloth_images")
     right_images = [f for f in os.listdir(data_dir) if ("imager_" in f and "uv" not in f)]
 
     data_outdir = data_dir + "_processed"
@@ -106,7 +106,7 @@ def main():
         os.mkdir(data_outdir)
     # random.shuffle(right_images)
 
-    custom_processor = custom_processing("cable_segmasks")
+    custom_processor = custom_processing("cable_endpoints")
 
     for r_img_name in tqdm(right_images):
         
@@ -124,12 +124,12 @@ def main():
         r_mask = np.array(Image.open(osp.join(data_dir, r_mask_name)))
         l_mask = np.array(Image.open(osp.join(data_dir, l_mask_name)))
 
-        # # l_mask, r_mask, _, _ = get_segmasks(l_uv_img, r_uv_img, False)
-        l_mask = smooth_mask(l_mask, remove_small_artifacts=True)
-        r_mask = smooth_mask(r_mask, remove_small_artifacts=True)
+        # # # l_mask, r_mask, _, _ = get_segmasks(l_uv_img, r_uv_img, False)
+        # l_mask = smooth_mask(l_mask, remove_small_artifacts=True)
+        # r_mask = smooth_mask(r_mask, remove_small_artifacts=True)
 
-        l_mask = custom_processor(l_mask, l_uv_img) > 0
-        r_mask = custom_processor(r_mask, r_uv_img) > 0
+        # l_mask = custom_processor(l_mask, l_uv_img) > 0
+        # r_mask = custom_processor(r_mask, r_uv_img) > 0
 
 
         np.save(osp.join(data_outdir, l_mask_name.replace(".png", ".npy")), l_mask)
