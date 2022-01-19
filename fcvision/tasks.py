@@ -14,3 +14,4 @@ def get_task_parameters(params):
 		dataset_val = KPDataset(val=True)
 	else:
 		raise Exception("Task not supported.")
+	return params

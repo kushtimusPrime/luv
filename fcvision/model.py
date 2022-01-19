@@ -44,9 +44,9 @@ class PlModel(pl.LightningModule):
             self.vis_dir = None
             self.vis_counter = None
 
-        self.model = fcn_resnet50(pretrained=False, progress=False, num_classes=1)
+        self.model = fcn_resnet50(pretrained=False, progress=False, num_classes=params['num_classes'])
 
-        self.loss_fn = SegmentationLoss()
+        self.loss_fn = params['loss']
 
         t1 = torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.3, saturation=0.3, hue=0.15)
         t2 = torchvision.transforms.GaussianBlur(9, sigma=(1, 10.0))
