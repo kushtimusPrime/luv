@@ -29,15 +29,6 @@ def main():
         pl.seed_everything(params['seed'])
         np.random.seed(params['seed'])
 
-    # dataset = KPDataset()
-    # dataset_val = KPDataset(val=True)
-
-    # dataset = StereoSegDataset()
-    # dataset_val = StereoSegDataset(val=True)
-    import IPython; IPython.embed()
-    assert 0
-
-
     batch_size = 6
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(dataset_val, batch_size=12, num_workers=params['loader_n_workers'])
