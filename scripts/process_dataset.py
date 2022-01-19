@@ -19,7 +19,6 @@ def onclick(event):
 		return None
 	global coords
 	coords.append((int(ix), int(iy)))
-
 	if len(coords) == 2:
 		fig.canvas.mpl_disconnect(cid)
 

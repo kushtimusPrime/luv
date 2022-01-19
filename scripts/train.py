@@ -10,7 +10,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fcvision.dataset import KPDataset, StereoSegDataset
+from fcvision.dataset import KPDataset, StereoSegDataset, KPVectorDataset
 from fcvision.model import PlModel
 from fcvision.arg_utils import parse_args
 # from torchvision import models
@@ -32,8 +32,8 @@ def main():
     # dataset = KPDataset()
     # dataset_val = KPDataset(val=True)
 
-    dataset = StereoSegDataset()
-    dataset_val = StereoSegDataset(val=True)
+    # dataset = StereoSegDataset()
+    # dataset_val = StereoSegDataset(val=True)
     import IPython; IPython.embed()
     assert 0
 

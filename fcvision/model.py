@@ -12,6 +12,8 @@ import os
 from torchvision.models.segmentation import fcn_resnet50
 from torchvision.utils import save_image
 
+from fcvision.losses import *
+
 class AddGaussianNoise(object):
     def __init__(self, mean=0., std=0.25):
         self.std = std
@@ -44,6 +46,8 @@ class PlModel(pl.LightningModule):
 
         self.model = fcn_resnet50(pretrained=False, progress=False, num_classes=1)
 
+        self.loss_fn = SegmentationLoss()
+
         t1 = torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.3, saturation=0.3, hue=0.15)
         t2 = torchvision.transforms.GaussianBlur(9, sigma=(1, 10.0))
         t3 = torchvision.transforms.RandomErasing(p=0.7, scale=(0.02, 0.1), ratio=(0.3, 3.3), value=0, inplace=False)
@@ -71,8 +75,8 @@ class PlModel(pl.LightningModule):
 
         preds = self(ims)
 
-        loss_sm = F.binary_cross_entropy_with_logits(preds, targets)
-        self.log('SegMaskLoss', loss_sm, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        loss_sm = self.loss_fn(preds, targets)
+        self.log('Loss', loss_sm, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss_sm
 
     def validation_step(self, batch, batch_idx):

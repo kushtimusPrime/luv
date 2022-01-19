@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 
+from fcvision.tasks import get_task_parameters
 
 def parse_args():
     parser = ArgumentParser()
@@ -12,6 +13,7 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='real')
     parser.add_argument('--dataset-val', type=str, default='real_val')
     parser.add_argument('--checkpoint', type=str, default=None)
+    parser.add_argument('--task', type=str, default=None)
 
     optim_group = parser.add_argument_group("optim")
     optim_group.add_argument("--optim-type", default='sgd', type=str)
@@ -33,4 +35,7 @@ def parse_args():
     # parser.add_argument("--num-filters-scale", default=4, type=int)
 
     args = parser.parse_args()
-    return vars(args)
+    args = vars(args)
+    args = get_task_parameters(args)
+
+    return args
