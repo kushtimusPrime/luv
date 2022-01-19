@@ -30,8 +30,8 @@ def main():
         np.random.seed(params['seed'])
 
     batch_size = 6
-    loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
-    loader_val = DataLoader(dataset_val, batch_size=12, num_workers=params['loader_n_workers'])
+    loader = DataLoader(params['dataset'], batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
+    loader_val = DataLoader(params['dataset_val'], batch_size=12, num_workers=params['loader_n_workers'])
 
     model = PlModel(params, logdir)
 
