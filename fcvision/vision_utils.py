@@ -9,7 +9,7 @@ from matplotlib.patches import Circle
 
 
 def find_peaks(im):
-	return peak_local_max(im, min_distance=20, threshold_abs=0.7)
+	return peak_local_max(im, min_distance=20, threshold_abs=0.25) #0.7
 
 
 def find_center_of_mass(im):
@@ -56,6 +56,7 @@ def get_highest_depth_pt_within_radius(depth_img, nominal_pt, radius=20, depth_m
 
 	"""
 	depth_copy = np.copy(depth_img)
+	plt.imshow(depth_copy); plt.show()
 	depth_copy[:max(0, nominal_pt[0] - radius)] = 0
 	depth_copy[min(depth_img.shape[0] - 1, nominal_pt[0] + radius):] = 0
 	depth_copy[:,:max(0, nominal_pt[1] - radius)] = 0
@@ -64,36 +65,39 @@ def get_highest_depth_pt_within_radius(depth_img, nominal_pt, radius=20, depth_m
 	if depth_mask is not None:
 		depth_copy = np.multiply(depth_mask, depth_copy)
 
-
-	pt = np.unravel_index(np.argmax(depth_copy), depth_copy.shape)
+	depth_copy[depth_copy == 0] = 2
+	
+	pt = np.unravel_index(np.argmin(depth_copy), depth_copy.shape)
 	# print(pt)
-	# plt.imshow(depth_copy); plt.show()
+	plt.imshow(depth_copy); plt.show()
 
 	return pt
 
 
 
-def get_shake_point(phoxi_im, vis=False):
+def get_shake_point(phoxi_im, vis=False, random=False):
 	"""
 	Takes in a [h, w, 4] dimension image from the phoxi and outputs
 	a point on the cable mask with depth information closest to the
 	cable mask's center of mask.
 	"""
+
 	color_mask = get_cable_mask(phoxi_im[:,:,:3])
 
 	depth_mask = phoxi_im[:,:,3] > 0
-	com = find_center_of_mass(color_mask)
+	com = find_center_of_mass(color_mask) if not random else np.random.choice(np.concatenate(np.nonzero(color_mask), axis=-1))
 	valid_depth_mask = get_valid_depth_mask(color_mask, depth_mask)
-	plt.imshow(valid_depth_mask); plt.show()
+	#plt.imshow(valid_depth_mask); plt.show()
 	closest = closest_nonzero_pt(valid_depth_mask, com)
-	closest = get_highest_depth_pt_within_radius(im[:,:,3], closest, depth_mask=valid_depth_mask)
+	closest = get_highest_depth_pt_within_radius(phoxi_im[:,:,3], closest, radius=100 if not random else 5, depth_mask=valid_depth_mask)
 	if vis:
 		print(closest)
 		fig, ax = plt.subplots()
 		plt.imshow(color_mask)
 
-		circ = Circle((closest[1], closest[0]), 1, color='r')
-		ax.add_patch(circ)
+		# circ = Circle((closest[1], closest[0]), 1, color='r')
+		# ax.add_patch(circ)
+		plt.scatter(*closest[::-1])
 		plt.show()
 	return (int(closest[1]),int(closest[0]))
 

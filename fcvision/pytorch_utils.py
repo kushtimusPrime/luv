@@ -22,8 +22,8 @@ def torchify(*args, cls=torch.FloatTensor, device=None):
             x = np.array(x)
         if type(x) is not torch.Tensor:
             x = cls(x)
-        # if device is not None:
-        #     x = x.to(device)
+        if device is not None:
+            x = x.to(device)
         out.append(x)
     if len(out) == 1:
         return out[0]

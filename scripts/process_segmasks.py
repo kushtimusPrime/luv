@@ -136,8 +136,8 @@ def main():
         np.save(osp.join(data_outdir, r_mask_name.replace(".png", ".npy")), r_mask)
         Image.fromarray(l_mask).save(osp.join(data_outdir, l_mask_name))
         Image.fromarray(r_mask).save(osp.join(data_outdir, r_mask_name))
-        Image.fromarray(r_img).save(osp.join(data_outdir, r_img_name))
-        Image.fromarray(l_img).save(osp.join(data_outdir, l_img_name))
+        Image.fromarray(r_img/255.).save(osp.join(data_outdir, r_img_name))
+        Image.fromarray(l_img/255.).save(osp.join(data_outdir, l_img_name))
         Image.fromarray(l_uv_img).save(osp.join(data_outdir, l_uv_img_name))
         Image.fromarray(r_uv_img).save(osp.join(data_outdir, r_uv_img_name))
 

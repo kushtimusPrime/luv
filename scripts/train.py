@@ -34,6 +34,8 @@ def main():
 
     dataset = StereoSegDataset()
     dataset_val = StereoSegDataset(val=True)
+    import IPython; IPython.embed()
+    assert 0
 
 
     batch_size = 6

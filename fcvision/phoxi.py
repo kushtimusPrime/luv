@@ -27,7 +27,7 @@ def prepare_phoxi_image_for_net(im):
 	im = np.copy(im[:,:,1:])
 	im[:,:,:2] /= 255
 	im = np.transpose(im, (2, 0, 1))
-	im = ptu.torchify(im)
+	im = ptu.torchify(im,device='cuda')
 	im = torch.unsqueeze(im, 0)
 	return im
 
