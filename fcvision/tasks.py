@@ -1,4 +1,5 @@
 from fcvision.losses import *
+from fcvision.dataset import KPDataset, StereoSegDataset, KPVectorDataset
 
 def get_task_parameters(params):
 	if params['task'] == "cloth":
