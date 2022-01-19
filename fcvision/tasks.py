@@ -9,7 +9,8 @@ def get_task_parameters(params):
 
 	elif params['task'] == "cable_endpoints":
 		params['num_classes'] = 1 # vector output as well
-		params['loss'] = KPVectorLoss()
+		# params['loss'] = KPVectorLoss()
+		params['loss'] = SegmentationLoss()
 		params['dataset'] = KPDataset()
 		params['dataset_val'] = KPDataset(val=True)
 	else:
