@@ -10,8 +10,8 @@ def parse_args():
     parser.add_argument('--n-gpus', type=int, default=1)
     parser.add_argument('--loader-n-workers', type=int, default=4)
     parser.add_argument('--epochs', type=int, default=200)
-    parser.add_argument('--dataset', type=str, default='real')
-    parser.add_argument('--dataset-val', type=str, default='real_val')
+    # parser.add_argument('--dataset', type=str, default='real')
+    # parser.add_argument('--dataset-val', type=str, default='real_val')
     parser.add_argument('--checkpoint', type=str, default=None)
     parser.add_argument('--task', type=str, default=None)
 
