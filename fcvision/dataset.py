@@ -67,7 +67,7 @@ class KPDataset:
 
 class StereoSegDataset:
 
-    def __init__(self, dataset_dir="data/cable_uv_images_processed", val=False):
+    def __init__(self, dataset_dir="data/cloth_images_processed", val=False):
         self.dataset_dir = dataset_dir
         self.datapoints = [f for f in os.listdir(self.dataset_dir) if ("image" in f and not "uv" in f)]
         self.val = val
