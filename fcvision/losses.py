@@ -16,11 +16,11 @@ from torchvision.utils import save_image
 
 class SegmentationLoss(nn.Module):
 
-	def __init__(self):
-	    super().__init__()
+    def __init__(self):
+        super().__init__()
 
-	def forward(self, preds, targets):
-		return F.binary_cross_entropy_with_logits(preds, targets)
+    def forward(self, preds, targets):
+        return F.binary_cross_entropy_with_logits(preds, targets)
 
 
 class MaskedMSELoss(nn.Module):
@@ -50,8 +50,8 @@ class KPVectorLoss(nn.Module):
 
   def forward(self, output, target, ignore_mask):
 
-  	target_seg, target_vec = None, None # TODO
-  	pred_seg, pred_vec = None, None # TODO
+    target_seg, target_vec = None, None # TODO
+    pred_seg, pred_vec = None, None # TODO
     seg_loss = self.segmentation_loss(pred_seg, target_seg)
 
     ignore_mask = target_seg > 0.1
