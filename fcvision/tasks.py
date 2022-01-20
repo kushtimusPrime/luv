@@ -10,18 +10,27 @@ def get_task_parameters(params):
 	elif params['task'] == "cable_endpoints":
 		params['num_classes'] = 1
 		params['loss'] = SegmentationLoss()
-		params['dataset'] = KPDataset()
-		params['dataset_val'] = KPDataset(val=True)
+		try:
+			params['dataset'] = KPDataset()
+			params['dataset_val'] = KPDataset(val=True)
+		except:
+			pass
 	elif params['task'] == "cable_vecs":
 		params['num_classes'] = 2 # vector output as well
 		params['loss'] = KPVectorLoss()
-		params['dataset'] = KPVectorDataset()
-		params['dataset_val'] = KPVectorDataset(val=True)
+		try:
+			params['dataset'] = KPVectorDataset()
+			params['dataset_val'] = KPVectorDataset(val=True)
+		except:
+			pass
 	elif params['task'] == "cable_kp_vecs":
 		params['num_classes'] = 2
 		params['loss'] = SegmentationLoss()
-		params['dataset'] = KPVectorDataset(dataset_dir="data/cable_kp_vecs")
-		params['dataset_val'] = KPVectorDataset(dataset_dir="data/cable_kp_vecs", val=True)
+		try:
+			params['dataset'] = KPVectorDataset(dataset_dir="data/cable_kp_vecs")
+			params['dataset_val'] = KPVectorDataset(dataset_dir="data/cable_kp_vecs", val=True)
+		except:
+			pass # in case datasets aren't on the machine (for testing)
 
 	else:
 		raise Exception("Task not supported.")

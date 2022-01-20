@@ -13,7 +13,7 @@ def parse_args():
     # parser.add_argument('--dataset', type=str, default='real')
     # parser.add_argument('--dataset-val', type=str, default='real_val')
     parser.add_argument('--checkpoint', type=str, default=None)
-    parser.add_argument('--task', type=str, default=None)
+    parser.add_argument('--task', type=str, default="cable_endpoints")
 
     optim_group = parser.add_argument_group("optim")
     optim_group.add_argument("--optim-type", default='sgd', type=str)

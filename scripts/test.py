@@ -10,7 +10,6 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fcvision.dataset import KPDataset
 from fcvision.model import PlModel
 from fcvision.arg_utils import parse_args
 # from torchvision import models
@@ -24,7 +23,7 @@ def main():
 	logdir = ru.get_file_prefix(params)
 	os.makedirs(os.path.join(logdir, 'lightning_logs'))
 	model = PlModel.load_from_checkpoint(params['checkpoint'], params=params, logdir=logdir).eval()
-	dataset_val = KPDataset(val=True)
+	dataset_val = params['dataset_val']
 
 	for idx in range(len(dataset_val)):
 		im = torch.unsqueeze(dataset_val[idx], 0)

@@ -24,6 +24,7 @@ import fcvision.pytorch_utils as ptu
 class KeypointNetwork:
 
 	def __init__(self, checkpoint, params=None, logdir=None):
+		self.params = params
 		self.model = PlModel.load_from_checkpoint(checkpoint, params=params, logdir=logdir).cuda().eval()
 
 
