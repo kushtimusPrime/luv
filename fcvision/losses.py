@@ -50,8 +50,8 @@ class KPVectorLoss(nn.Module):
 
   def forward(self, output, target):
 
-    target_seg, target_vec = None, None # TODO
-    pred_seg, pred_vec = None, None # TODO
+    target_seg, target_vec = target[:,0], target[:,1]
+    pred_seg, pred_vec = output[:,0], output[:,1]
     seg_loss = self.segmentation_loss(pred_seg, target_seg)
 
     ignore_mask = target_seg > 0.1

@@ -67,7 +67,7 @@ class KPDataset:
 
 class KPVectorDataset:
 
-    def __init__(self, dataset_dir="data/cable_images_labeled2", val=False):
+    def __init__(self, dataset_dir="data/cable_vecs", val=False):
         self.dataset_dir = dataset_dir
         self.datapoints = [f for f in os.listdir(self.dataset_dir) if "image" in f]
         self.val = val
