@@ -48,7 +48,7 @@ class KPVectorLoss(nn.Module):
     self.vector_loss = MaskedMSELoss()
     self.segmentation_loss = SegmentationLoss()
 
-  def forward(self, output, target, ignore_mask):
+  def forward(self, output, target):
 
     target_seg, target_vec = None, None # TODO
     pred_seg, pred_vec = None, None # TODO
