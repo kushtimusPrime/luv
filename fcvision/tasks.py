@@ -15,8 +15,8 @@ def get_task_parameters(params):
 	elif params['task'] == "cable_vecs":
 		params['num_classes'] = 2 # vector output as well
 		params['loss'] = KPVectorLoss()
-		params['dataset'] = KPDataset()
-		params['dataset_val'] = KPDataset(val=True)
+		params['dataset'] = KPVectorDataset()
+		params['dataset_val'] = KPVectorDataset(val=True)
 
 	else:
 		raise Exception("Task not supported.")
