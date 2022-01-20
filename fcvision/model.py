@@ -96,6 +96,8 @@ class PlModel(pl.LightningModule):
         for j in range(len(outputs['ims'])):
             im = outputs['ims'][j]
             pred = torch.sigmoid(outputs['preds'][j])
+            if self.params['num_classes'] > 1:
+                pred = pred[0] # temporary, for kp-vec prediction
             save_image(im /255, os.path.join(self.vis_dir, '%d_%d_im.png' % (idx, j)))
             save_image(pred, os.path.join(self.vis_dir, '%d_%d_pred.png' % (idx, j)))
             save_image(pred + im/255, os.path.join(self.vis_dir, '%d_%d_overlayed.png' % (idx, j)))
