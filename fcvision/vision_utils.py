@@ -56,7 +56,7 @@ def get_highest_depth_pt_within_radius(depth_img, nominal_pt, radius=20, depth_m
 
 	"""
 	depth_copy = np.copy(depth_img)
-	plt.imshow(depth_copy); plt.show()
+	# plt.imshow(depth_copy); plt.show()
 	depth_copy[:max(0, nominal_pt[0] - radius)] = 0
 	depth_copy[min(depth_img.shape[0] - 1, nominal_pt[0] + radius):] = 0
 	depth_copy[:,:max(0, nominal_pt[1] - radius)] = 0
@@ -69,7 +69,7 @@ def get_highest_depth_pt_within_radius(depth_img, nominal_pt, radius=20, depth_m
 	
 	pt = np.unravel_index(np.argmin(depth_copy), depth_copy.shape)
 	# print(pt)
-	plt.imshow(depth_copy); plt.show()
+	# plt.imshow(depth_copy); plt.show()
 
 	return pt
 
@@ -81,6 +81,10 @@ def get_shake_point(phoxi_im, vis=False, random=False):
 	a point on the cable mask with depth information closest to the
 	cable mask's center of mask.
 	"""
+	vis=True
+
+	phoxi_im = phoxi_im.copy()
+	phoxi_im[550:] = 0
 
 	color_mask = get_cable_mask(phoxi_im[:,:,:3])
 
