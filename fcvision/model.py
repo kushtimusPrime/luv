@@ -12,6 +12,8 @@ import os
 from torchvision.models.segmentation import fcn_resnet50
 from torchvision.utils import save_image
 
+from fcvision.losses import *
+
 class AddGaussianNoise(object):
     def __init__(self, mean=0., std=0.25):
         self.std = std
@@ -42,7 +44,9 @@ class PlModel(pl.LightningModule):
             self.vis_dir = None
             self.vis_counter = None
 
-        self.model = fcn_resnet50(pretrained=False, progress=False, num_classes=1)
+        self.model = fcn_resnet50(pretrained=False, progress=False, num_classes=params['num_classes'])
+
+        self.loss_fn = params['loss']
 
         t1 = torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.3, saturation=0.3, hue=0.15)
         t2 = torchvision.transforms.GaussianBlur(9, sigma=(1, 10.0))
@@ -71,8 +75,8 @@ class PlModel(pl.LightningModule):
 
         preds = self(ims)
 
-        loss_sm = F.binary_cross_entropy_with_logits(preds, targets)
-        self.log('SegMaskLoss', loss_sm, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        loss_sm = self.loss_fn(preds, targets)
+        self.log('Loss', loss_sm, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss_sm
 
     def validation_step(self, batch, batch_idx):
@@ -92,9 +96,11 @@ class PlModel(pl.LightningModule):
         for j in range(len(outputs['ims'])):
             im = outputs['ims'][j]
             pred = torch.sigmoid(outputs['preds'][j])
-            save_image(im /255, os.path.join(self.vis_dir, '%d_%d_im.png' % (idx, j)))
+            if self.params['num_classes'] > 1:
+                pred = pred[0] # temporary, for kp-vec prediction
+            save_image(im, os.path.join(self.vis_dir, '%d_%d_im.png' % (idx, j)))
             save_image(pred, os.path.join(self.vis_dir, '%d_%d_pred.png' % (idx, j)))
-            save_image(pred + im/255, os.path.join(self.vis_dir, '%d_%d_overlayed.png' % (idx, j)))
+            save_image(pred , os.path.join(self.vis_dir, '%d_%d_overlayed.png' % (idx, j)))
 
 
     def configure_optimizers(self):
