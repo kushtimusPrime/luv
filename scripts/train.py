@@ -32,8 +32,6 @@ def main():
     loader = DataLoader(params['dataset'], batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(params['dataset_val'], batch_size=12, num_workers=params['loader_n_workers'])
 
-    import IPython; IPython.embed(); assert 0
-
     model = PlModel(params, logdir)
 
     trainer = pl.Trainer(
