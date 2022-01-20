@@ -3,7 +3,6 @@ import torchvision.transforms as transforms
 import numpy as np
 import os
 
-import torch
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -26,12 +25,14 @@ def main():
     os.makedirs(os.path.join(logdir, 'lightning_logs'))
 
     if params['seed'] != -1:
-        pl.seed_everything(params['seed'])
+        # pl.seed_everything(params['seed'])
         np.random.seed(params['seed'])
 
     batch_size = 6
     loader = DataLoader(params['dataset'], batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(params['dataset_val'], batch_size=12, num_workers=params['loader_n_workers'])
+
+    import IPython; IPython.embed(); assert 0
 
     model = PlModel(params, logdir)
 

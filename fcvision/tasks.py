@@ -17,6 +17,11 @@ def get_task_parameters(params):
 		params['loss'] = KPVectorLoss()
 		params['dataset'] = KPVectorDataset()
 		params['dataset_val'] = KPVectorDataset(val=True)
+	elif params['task'] == "cable_kp_vecs":
+		params['num_classes'] = 2
+		params['loss'] = SegmentationLoss()
+		params['dataset'] = KPVectorDataset(dataset_dir="data/cable_vecs2")
+		params['dataset_val'] = KPVectorDataset(dataset_dir="data/cable_vecs2", val=True)
 
 	else:
 		raise Exception("Task not supported.")

@@ -53,7 +53,10 @@ class KPDataset:
         new_im[1:] = im
         im = new_im
         target_file = im_file.replace("image", "target")
-        target = np.load(osp.join(self.dataset_dir, target_file))[np.newaxis,:,:]
+
+        target = np.load(osp.join(self.dataset_dir, target_file))
+        if len(target.shape) == 2:
+            target = target[np.newaxis,:,:]
 
         im, target = target_transforms(im, target)
 
