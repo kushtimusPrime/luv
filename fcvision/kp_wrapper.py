@@ -33,8 +33,9 @@ class KeypointNetwork:
 
 
 	def __call__(self, img, mode='kp'):
-		orig_img = img.color._data.copy()
-		img = self._prepare_image(img)
+		if process_images:
+			orig_img = img.color._data.copy()
+			img = self._prepare_image(img)
 		with torch.no_grad():
 			pred = torch.sigmoid(self.model(img))[0, 0].cpu().numpy()
 			# plt.imshow(pred)
