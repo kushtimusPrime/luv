@@ -31,6 +31,14 @@ def get_task_parameters(params):
 			params['dataset_val'] = KPVectorDataset(dataset_dir="data/cable_kp_vecs", val=True)
 		except:
 			pass # in case datasets aren't on the machine (for testing)
+	elif params['task'] == "cable_slide":
+		params['num_classes'] = 1
+		params['loss'] = SegmentationLoss()
+		try:
+			params['dataset'] = KPDataset(dataset_dir="data/cable_slide")
+			params['dataset_val'] = KPDataset(dataset_dir="data/cable_slide", val=True)
+		except:
+			pass # in case datasets aren't on the machine (for testing)
 
 	else:
 		raise Exception("Task not supported.")
