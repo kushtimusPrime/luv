@@ -32,7 +32,7 @@ class KeypointNetwork:
 		return prepare_phoxi_image_for_net(img)
 
 
-	def __call__(self, img, mode='kp'):
+	def __call__(self, img, mode='kp', process_images=True):
 		if process_images:
 			orig_img = img.color._data.copy()
 			img = self._prepare_image(img)
