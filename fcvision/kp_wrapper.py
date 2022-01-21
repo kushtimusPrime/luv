@@ -20,6 +20,7 @@ from matplotlib.patches import Circle
 from fcvision.phoxi import prepare_phoxi_image_for_net
 import fcvision.pytorch_utils as ptu
 from fcvision.tasks import get_task_parameters
+import fcvision.pytorch_utils as ptu
 
 
 class KeypointNetwork:
@@ -45,6 +46,10 @@ class KeypointNetwork:
         if prep:
             orig_img = img.color._data.copy()
             img = self._prepare_image(img)
+        else:
+        	img = np.transpose(img, (2, 0, 1))
+        	img = ptu.torchify(img,device='cuda')
+			img = torch.unsqueeze(img, 0)
         with torch.no_grad():
             pred = torch.sigmoid(self.model(img))[0].cpu().numpy()
             # plt.imshow(pred)
