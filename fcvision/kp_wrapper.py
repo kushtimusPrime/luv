@@ -41,9 +41,10 @@ class KeypointNetwork:
         return prepare_phoxi_image_for_net(cpy)
 
 
-    def __call__(self, img, mode='kp', vis=True):
-        orig_img = img.color._data.copy()
-        img = self._prepare_image(img)
+    def __call__(self, img, mode='kp', vis=True, prep=True):
+        if prep:
+            orig_img = img.color._data.copy()
+            img = self._prepare_image(img)
         with torch.no_grad():
             pred = torch.sigmoid(self.model(img))[0].cpu().numpy()
             # plt.imshow(pred)
@@ -102,8 +103,6 @@ class KeypointNetwork:
             return coords_list, pseudo_endpoints
         else:
             return pred
-
-
 class SegNetwork:
 
     def __init__(self, checkpoint, params=None, logdir=None):
