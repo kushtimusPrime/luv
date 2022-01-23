@@ -30,6 +30,10 @@ def target_transforms(image, target):
         image = TF.vflip(image)
         target = TF.vflip(target)
 
+    # image = image + np.random.uniform(0, 0.1, image.shape)
+    image = TF.adjust_brightness(image, np.random.uniform(0.5, 1.5))
+    image = TF.adjust_contrast(image, np.random.uniform(0.85, 1.15))
+
     return image, target
 
 
@@ -50,7 +54,9 @@ class KPDataset:
         im = np.load(osp.join(self.dataset_dir, im_file))
         new_im = np.zeros([3, im.shape[1], im.shape[2]])
         new_im[0] = np.copy(im[0])
-        new_im[1:] = im
+        new_im[1] = np.copy(im[0])
+        new_im[2] = np.copy(im[0])
+        # new_im[1:] = im
         im = new_im
         target_file = im_file.replace("image", "target")
 

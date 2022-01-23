@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.utils import save_image
-import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import numpy as np
 import torchvision
