@@ -89,7 +89,7 @@ class KPConcatDataset:
         new_im[0] = np.copy(im[0])
         new_im[1:] = im
         im = new_im
-        target_file = im_file.replace("image", "target")
+        target_file = im_file.replace("image_", "target_")
 
         target = np.load(target_file)
         if len(target.shape) == 2:
