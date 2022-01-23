@@ -68,6 +68,43 @@ class KPDataset:
         return len(self.datapoints)
 
 
+class KPConcatDataset:
+
+    def __init__(self, dataset_dir="data/cable_images_labeled", val=False):
+        self.dataset_dir1 = "data/cable_images_labeled"
+        self.dataset_dir2 = "data/cable_images_overhead_labeled"
+        self.datapoints = [osp.join(self.dataset_dir1, f) for f in os.listdir(self.dataset_dir1) if "image" in f]
+        self.datapoints = self.datapoints + [osp.join(self.dataset_dir2, f) for f in os.listdir(self.dataset_dir2) if "image" in f]
+        self.val = val
+        if self.val:
+            self.datapoints = self.datapoints[:10]
+        else:
+            self.datapoints = self.datapoints[10:]
+
+
+    def __getitem__(self, idx):
+        im_file = self.datapoints[idx]
+        im = np.load(im_file)
+        new_im = np.zeros([3, im.shape[1], im.shape[2]])
+        new_im[0] = np.copy(im[0])
+        new_im[1:] = im
+        im = new_im
+        target_file = im_file.replace("image", "target")
+
+        target = np.load(target_file)
+        if len(target.shape) == 2:
+            target = target[np.newaxis,:,:]
+
+        im, target = target_transforms(im, target)
+
+        if self.val:
+            return ptu.torchify(im)
+        return ptu.torchify(im, target)
+
+    def __len__(self):
+        return len(self.datapoints)
+
+
 class KPVectorDataset:
 
     def __init__(self, dataset_dir="data/cable_vecs", val=False):
