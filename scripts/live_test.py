@@ -22,7 +22,7 @@ def main():
 		input("Press enter when ready to take a new image.")
 		im = cam.capture()
 		np_im = im._data[:,:,0] / 255.
-		pred = model(im, mode='vis')
+		pred = model(im, mode='vis')[0]
 
 		plt.imshow(pred + np_im); plt.show()
 

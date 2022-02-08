@@ -8,8 +8,10 @@ from PIL import Image
 
 START_ID = 0
 
-INPUT_DIR = "data/cable_images"
-OUTPUT_DIR = "data/cable_images_labeled2"
+INPUT_DIR = "data/endpoint"
+INPUT_DIR2 = "data/knot"
+INPUT_DIR3 = "data/keep_going"
+OUTPUT_DIR = "data/cable_images_overhead_labeled"
 
 
 def onclick(event):
@@ -40,11 +42,16 @@ def draw_gaussian(mu_x, mu_y, size_x, size_y, sigma_x=12., sigma_y=12.):
 
 if __name__ == '__main__':
 
-	files = sorted(os.listdir(INPUT_DIR))
+	files = [f for f in os.listdir(INPUT_DIR) if "color" in f]
+	files = files + [f for f in os.listdir(INPUT_DIR2) if "color" in f]
+	files = files + [f for f in os.listdir(INPUT_DIR3) if "color" in f]
+
 	if not osp.exists(OUTPUT_DIR):
 		os.mkdir(OUTPUT_DIR)
 
-	for i, f in enumerate(files[START_ID:]):
+	for i, f in enumerate(files):
+		if i < START_ID:
+			continue
 		print(i)
 		coords = []
 		im = np.load(osp.join(INPUT_DIR, f))
@@ -64,8 +71,8 @@ if __name__ == '__main__':
 
 		# normalize both channels
 		gray_im = im[:,:,0] / 255
-		depth_im = im[:,:,3]
-		normalized_image = np.stack([gray_im, depth_im])
+		# depth_im = im[:,:,3]
+		normalized_image = np.stack([gray_im, gray_im, gray_im])
 
 		# save processed data
 		np.save(osp.join(OUTPUT_DIR, "target_%d"%i), target)
