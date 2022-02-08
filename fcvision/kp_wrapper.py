@@ -21,6 +21,7 @@ from fcvision.phoxi import prepare_phoxi_image_for_net
 import fcvision.pytorch_utils as ptu
 from fcvision.tasks import get_task_parameters
 import fcvision.pytorch_utils as ptu
+import time
 
 
 class KeypointNetwork:
@@ -42,12 +43,12 @@ class KeypointNetwork:
         return prepare_phoxi_image_for_net(cpy)
 
 
-    def __call__(self, img, mode='kp', vis=True, prep=True):
+    def __call__(self, img, mode='kp', vis=False, prep=True):
         if prep:
             orig_img = img.color._data.copy()
             img = self._prepare_image(img)
         else:
-            img = np.transpose(img, (2, 0, 1))
+#            img = np.transpose(img, (2, 0, 1))
             img = ptu.torchify(img,device='cuda')
             img = torch.unsqueeze(img, 0)
         with torch.no_grad():
@@ -55,37 +56,48 @@ class KeypointNetwork:
             # plt.imshow(pred)
             # plt.show()
         if mode == 'kp':
-            coords_list = []
-            for cur_class in range(self.params['num_classes']):
-                coords_list.append(find_peaks(pred[cur_class])) # do something with these
+            if self.params['num_classes'] == 2:
+                coords_list = []
+                # TODO: REVERSED OR NOT???
+                for cur_class in reversed(range(self.params['num_classes'])):
+                    coords_list.append(find_peaks(pred[cur_class])) # do something with these
+                    print(find_peaks(pred[cur_class]))
 
-            # TODO: rearrange second list to match first in cartesian coordinates
-            reversed_dirs = coords_list[1][::-1]
-            reg_dist = np.linalg.norm(coords_list[0] - coords_list[1], axis=1).sum()
-            rev_dist = np.linalg.norm(coords_list[0] - reversed_dirs, axis=1).sum()
-            if rev_dist < reg_dist:
-                coords_list[1] = reversed_dirs
-            coords_list = np.array(coords_list)
-            print(coords_list.shape)
-            coords_list = coords_list.reshape((2, -1, 2)).transpose(1, 0, 2)
+                res = []
+                if coords_list[0].shape[0] == 0 or coords_list[1].shape[0] == 0:
+                    print("No actual endpoints found")
+                else:
+                    for i in range(coords_list[0].shape[0]):
+                        cur_endpoint = coords_list[0][i]
+                        diffs = np.linalg.norm(coords_list[1] - cur_endpoint[None, :], axis=-1)
+                        closest_neck = coords_list[1][np.argmin(diffs)]
+                        res.append([cur_endpoint, closest_neck])
+                coords_list = np.array(res)
+
+                try:
+                    coords_list = coords_list.reshape((2, -1, 2)).transpose(1, 0, 2)
+                except:
+                    coords_list = np.zeros((0, 2, 2))
+            else:
+                # plt.imshow(pred[0])
+                # plt.show()
+                coords_list = np.expand_dims(find_peaks(pred[0]), axis=1)
+                necks_list = coords_list.copy()
+                # each is a Nx2 array of coords, we want Nx2x2
+                coords_list = np.concatenate([coords_list, necks_list], axis=1)
 
             masked_image = get_cable_mask(orig_img)
 
-            # plt.imshow(img.cpu().numpy().squeeze().transpose(1, 2, 0))
-            # for coord in coords:
-            #     plt.scatter(coord[1], coord[0], color='red')
-            # plt.show()
-
             # trace along outside of image to see if cable overflows, use these as pseudo endpoints
-            xmin, ymin, xmax, ymax = 175, 50, 1010, 550
+            xmin, ymin, xmax, ymax = 175, 50, 1010, 540
             pseudo_endpoints = []
             delta = 5
             if np.max(masked_image[ymin, xmin:xmax]) > 0:
                 aym = np.argmax(masked_image[ymin, xmin:xmax]) + xmin
                 pseudo_endpoints.append(((ymin, aym), (ymin - delta, aym)))
-            if np.max(masked_image[ymax, xmin:xmax]) > 0:
-                aym = np.argmax(masked_image[ymax, xmin:xmax]) + xmin
-                pseudo_endpoints.append(((ymax, aym), (ymax + delta, aym)))
+            # if np.max(masked_image[ymax, xmin:xmax]) > 0:
+            #     aym = np.argmax(masked_image[ymax, xmin:xmax]) + xmin
+            #     pseudo_endpoints.append(((ymax, aym), (ymax + delta, aym)))
             if np.max(masked_image[ymin:ymax, xmin]) > 0:
                 axm = np.argmax(masked_image[ymin:ymax, xmin]) + ymin
                 pseudo_endpoints.append(((axm, xmin), (axm, xmin - delta)))
@@ -101,9 +113,10 @@ class KeypointNetwork:
             if vis:
                 print(coords_list.shape, pseudo_endpoints.shape)
                 all_endpoints = np.concatenate((coords_list, pseudo_endpoints), axis=0)
-                plt.scatter(all_endpoints[:, :, 1], all_endpoints[:, :, 0], color='red')
+                plt.clf()
+                # plt.scatter(all_endpoints[:, :, 1], all_endpoints[:, :, 0], color='red')
                 plt.imshow(masked_image)
-                plt.show()
+                plt.savefig(f"/home/jkerr/yumi/cable-untangling/logs/{mode}_{int(time.time())}_vis.png")
 
             return coords_list, pseudo_endpoints
         else:

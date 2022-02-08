@@ -16,13 +16,14 @@ from fcvision.arg_utils import parse_args
 import fcvision.run_utils as ru
 from fcvision.vision_utils import find_peaks
 from matplotlib.patches import Circle
-
+torch.cuda.memory_summary(device=None, abbreviated=False)
+torch.cuda.empty_cache()
 
 def main():
 	params = parse_args()
 	logdir = ru.get_file_prefix(params)
 	os.makedirs(os.path.join(logdir, 'lightning_logs'))
-	model = PlModel.load_from_checkpoint(params['checkpoint'], params=params, logdir=logdir).eval()
+	model = PlModel.load_from_checkpoint(params['checkpoint'], params=params, logdir=logdir).eval().cuda()
 	dataset_val = params['dataset_val']
 
 	for idx in range(len(dataset_val)):
