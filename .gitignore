@@ -9,6 +9,7 @@ PhotoneoLogFiles
 venv
 
 *.pyc
+*.egg-info/*
 *.jpg
 *.png
 *.pdf
