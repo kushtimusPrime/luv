@@ -1,5 +1,5 @@
 from fcvision.losses import *
-from fcvision.dataset import KPDataset, StereoSegDataset, KPVectorDataset
+from fcvision.dataset import KPDataset, StereoSegDataset, CableSegDataset, KPVectorDataset
 
 def get_task_parameters(params):
 	if params['task'] == "cloth":
@@ -37,6 +37,14 @@ def get_task_parameters(params):
 		try:
 			params['dataset'] = KPDataset(dataset_dir="data/cable_slide")
 			params['dataset_val'] = KPDataset(dataset_dir="data/cable_slide", val=True)
+		except:
+			pass # in case datasets aren't on the machine (for testing)
+	elif params['task'] == "cable_seg":
+		params['num_classes'] = 1
+		params['loss'] = SegmentationLoss()
+		try:
+			params['dataset'] = CableSegDataset()
+			params['dataset_val'] = CableSegDataset(val=True)
 		except:
 			pass # in case datasets aren't on the machine (for testing)
 
