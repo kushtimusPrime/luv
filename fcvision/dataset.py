@@ -10,6 +10,7 @@ import torchvision.transforms.functional as TF
 import random
 
 
+
 def target_transforms(image, target):
     image = torch.Tensor(image)
     target = torch.Tensor(target)
@@ -99,6 +100,8 @@ class CableSegDataset:
         if len(target.shape) == 2:
             target = target[np.newaxis,:,:]
         target[target > 0] = 1.0
+        if im.max() > 1.0:
+            im = im /255.
         im, target = target_transforms(im, target)
 
         if self.val:
