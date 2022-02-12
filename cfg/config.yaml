@@ -1,0 +1,17 @@
+dataset:
+  name: "FCDataset"
+  dataset_dir: "data/cable_seg"
+  val: False
+  transform: True
+dataset_val:
+  name: "FCDataset"
+  dataset_dir: "data/cable_seg"
+  val: True
+  transform: True
+train:
+  loss:
+    name: "SegmentationLoss"
+  optimizer:
+    optim_learning_rate: 0.002
+  num_classes: 1
+  seed: -1
