@@ -27,7 +27,7 @@ def main():
 		with torch.no_grad():
 			pred = model(im)[0, 0].cpu().numpy()
 		im = Image.fromarray(pred)
-		im.save(osp.join("logdir", "vis", "image_%d.jpg"%idx))
+		im.save(osp.join(logdir, "vis", "image_%d.jpg"%idx))
 
 
 if __name__ == '__main__':
