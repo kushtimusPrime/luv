@@ -1,0 +1,5 @@
+dataset:
+  name: "FCDataset"
+  dataset_dir: "data/cable_seg"
+  val: False
+  transform: True
