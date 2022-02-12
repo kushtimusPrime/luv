@@ -43,5 +43,8 @@ def parse_yaml(fname):
         ret["loss"] = loss
         pl_model = build_PL_model(cfg["train"], ret["loss"])
         ret["seed"] = cfg["train"]["seed"]
+    if "experiment" in cfg:
+        ret["experiment"] = cfg["experiment"]
+        
 
     return cfg, ret

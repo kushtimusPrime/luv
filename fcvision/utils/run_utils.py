@@ -29,8 +29,10 @@ def seed(s, envs=None):
 
 
 def get_file_prefix(params):
-    if params['exper_name'] is not None:
-        folder = os.path.join('outputs', params['exper_name'])
+    if "experiment" in params:
+        now = datetime.now()
+        date_string = now.strftime("%Y-%m-%d/%H-%M-%S")
+        folder = os.path.join('outputs', params['experiment'] + "_" + date_string)
     else:
         now = datetime.now()
         date_string = now.strftime("%Y-%m-%d/%H-%M-%S")
