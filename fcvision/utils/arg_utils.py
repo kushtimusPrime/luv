@@ -4,7 +4,11 @@ import yaml
 from fcvision.learning.dataset import build_dataset
 from fcvision.learning.losses import build_loss
 from fcvision.learning.model import build_PL_model
-from fcvision.cameras import build_camera
+
+try:
+    from fcvision.cameras import build_camera
+except:
+    pass # camera libraries not installed
 
 
 def load_yaml(fname):
