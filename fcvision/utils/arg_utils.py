@@ -31,7 +31,7 @@ def parse_yaml(fname):
         ret["experiment"] = cfg["experiment"]
     if "test" in cfg:
         assert "train" not in cfg
-        pl_model = build_PL_model(cfg["test"], train=False, loss=ret["loss"], checkpoint=cfg["test"]["checkpoint"])
+        pl_model = build_PL_model(cfg["test"], train=False, loss=None, checkpoint=cfg["test"]["checkpoint"])
         ret["model"] = pl_model
         ret["seed"] = cfg["train"]["seed"]
     return cfg, ret
