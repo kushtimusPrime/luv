@@ -19,7 +19,7 @@ def build_PL_model(cfg, loss):
     params = {
         "num_classes": cfg["num_classes"],
         "loss": loss,
-        "optim_learning_rate": cfg["optim_learning_rate"]
+        "optim_learning_rate": cfg["optimizer"]["optim_learning_rate"]
     }
     return PlModel(params)
 
