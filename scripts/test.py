@@ -23,7 +23,7 @@ def main():
 	for idx in range(len(dataset_val)):
 		im = torch.unsqueeze(dataset_val[idx][0], 0).cuda()
 		with torch.no_grad():
-			pred = model(im)[0, 0].numpy()
+			pred = model(im)[0, 0].cpu().numpy()
 		print(pred.shape)
 
 
