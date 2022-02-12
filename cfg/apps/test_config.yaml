@@ -1,7 +1,4 @@
-dataset_val:
-  dataset_dir: "data/cable_seg"
-  val: True
-  transform: True
+dataset_val: "cfg/datasets/cable_seg_val.yaml"
 test:
   num_classes: 1
   seed: -1

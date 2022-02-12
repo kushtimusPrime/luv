@@ -1,5 +1,5 @@
-dataset: "cfg/datasets/cable_seg"
-dataset_val: "cfg/datasets/cable_seg_val"
+dataset: "cfg/datasets/cable_seg.yaml"
+dataset_val: "cfg/datasets/cable_seg_val.yaml"
 train:
   loss:
     name: "SegmentationLoss"
