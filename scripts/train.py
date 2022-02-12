@@ -25,7 +25,6 @@ def main():
         pl.seed_everything(params['seed'])
         np.random.seed(params['seed'])
 
-    batch_size = 2
     loader = DataLoader(params['dataset'], batch_size=params["batch_size"], shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(params['dataset_val'], batch_size=12, num_workers=params['loader_n_workers'])
 
