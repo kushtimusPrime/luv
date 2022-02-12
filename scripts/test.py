@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 from PIL import Image
+import torch
 
 import fcvision.utils.run_utils as ru
 from fcvision.utils.arg_utils import parse_yaml
