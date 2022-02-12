@@ -16,7 +16,7 @@ def main():
 	cfg, params = parse_yaml(osp.join("cfg", "test_config.yaml"))
 
 	logdir = ru.get_file_prefix(params)
-	os.makedirs(os.path.join(logdir, 'lightning_logs'))
+	os.makedirs(os.path.join(logdir, 'vis'))
 
 	model = params["model"]
 	model.logdir = logdir

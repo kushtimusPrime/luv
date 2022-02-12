@@ -62,6 +62,8 @@ class FCDataset:
             self.image_fnames = self.image_fnames[:10]
         else:
             self.image_fnames = self.image_fnames[10:]
+        print(val)
+        assert 0
         self.mask_fnames = [f.replace("image", "target") for f in self.image_fnames]
 
 
