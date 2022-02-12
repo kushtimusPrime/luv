@@ -7,6 +7,8 @@ from PIL import Image
 import torch
 from torch.utils.data import Dataset
 import torchvision.transforms.functional as TF
+import cv2
+import glob
 import random
 
 
@@ -146,28 +148,42 @@ class KPVectorDataset:
 
 
 class StereoSegDataset:
-
-    def __init__(self, dataset_dir="data/cloth_images_processed", val=False):
+    def __init__(self, dataset_dir, max_size, val=False):
+        self.max_size=max_size
         self.dataset_dir = dataset_dir
-        self.datapoints = [f for f in os.listdir(self.dataset_dir) if ("image" in f and not "uv" in f)]
+        fnames=os.listdir(self.dataset_dir)
+        self.datapoints=[]
+        for f in fnames:
+            if 'image' in f and not 'uv' in f:
+                self.datapoints.append(f)
         self.val = val
         if self.val:
             self.datapoints = self.datapoints[:10]
         else:
             self.datapoints = self.datapoints[10:]
-
+        self.img_dict={}
 
     def __getitem__(self, idx):
-        im_file = self.datapoints[idx]
-        im = np.array(Image.open(osp.join(self.dataset_dir, im_file)))
-        im = np.transpose(im, (2, 0, 1))
-        # im = np.load(osp.join(self.dataset_dir, im_file))
-        target_file = im_file.replace("image", "mask")
-        target_file = target_file.replace(".png", ".npy")
-        target = np.load(osp.join(self.dataset_dir, target_file))[np.newaxis,:,:]
-
+        if idx in self.img_dict:
+            im,target=self.img_dict[idx]
+        else:
+            im_file = self.datapoints[idx]
+            im = np.array(Image.open(osp.join(self.dataset_dir, im_file)))/255.
+            im=im.astype(np.float32)
+            #resize the imgs to fit inside max size
+            scale_factor=self.max_size/max(im.shape[1],im.shape[2])
+            # next line is swapped bc cv2 wants width,height
+            new_size = (int(scale_factor*im.shape[1]),int(scale_factor*im.shape[0]))
+            im=cv2.resize(im,new_size)
+            im = np.transpose(im, (2, 0, 1))
+            target_file = im_file.replace("image", "mask")
+            #target_file = target_file.replace(".png", ".npy")
+            #target = np.load(osp.join(self.dataset_dir, target_file))[:,:,np.newaxis].astype(np.float32)
+            target = np.array(Image.open(osp.join(self.dataset_dir, target_file)))/255.
+            target=target.astype(np.float32)
+            target=cv2.resize(target,new_size)[np.newaxis,:,:]
+            self.img_dict[idx]=(im,target)
         im, target = target_transforms(im, target)
-
         if self.val:
             return ptu.torchify(im)
         return ptu.torchify(im, target)

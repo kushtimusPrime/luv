@@ -19,7 +19,11 @@ from yumiplanning.yumi_kinematics import YuMiKinematics as YK
 
 N_COLLECT = 1000
 START_ID = 0
-OUTPUT_DIR = "data/cloth_images_auto_dec16justin"
+OUTPUT_DIR = "data/cloth_images_auto_test"
+RES='2K'
+UV_EXP=15
+RGB_EXP=25
+AUTOMATIC=False
 
 colors = {
     "green": (np.array([40, 50, 100]), np.array([80, 255, 255])),
@@ -29,22 +33,17 @@ colors = {
 
 
 def get_rgb(zed):
-    zed.set_exposure(80)
-    time.sleep(1)
     iml, imr = zed.capture_image()
     return iml, imr
 
 
 def get_segmasks(zed, plug, color="blue", plot=True):
-
-    zed.set_exposure(30)
+    zed.set_exposure(UV_EXP)
     plug.turn_on()
     time.sleep(1)
     img_left, img_right, img_depth = zed.capture_image(depth=True)
     plug.turn_off()
-    img_left = img_left[:, :, ::-1]
-    img_right = img_right[:, :, ::-1]
-    # plt.imshow(img_left[:,:,::-1]); plt.show(); assert 0
+    zed.set_exposure(RGB_EXP)
     hsv_left = cv2.cvtColor(img_left, cv2.COLOR_RGB2HSV)
     hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
 
@@ -116,7 +115,7 @@ def sample_cloth_point(cloth_seg):
     for i in range(0, nb_components):
         if sizes[i] >= min_size:
             cloth_seg[output == i + 1] = 255
-    # sometimes choose a point only along the edge
+    #choose a point only along the edge
     for i in range(5):
         #remove some from border for safer grasps
         eroded = cv2.erode(cloth_seg, np.ones((3, 3)))
@@ -131,42 +130,38 @@ def sample_cloth_point(cloth_seg):
 
 
 def reset_cloth(iface: Interface):
-    # TODO: dragging move, probability of grabbing corner
     # input("Press enter when ready to take a new image.")
     img = iface.take_image()
     colorim = img.color._data[:, :, 0]
     h, w = colorim.shape
     g = GraspSelector(img, iface.cam.intrinsics, iface.T_PHOXI_BASE)
     cloth_seg = colorim
-    cloth_seg[cloth_seg < 60] = 0
-    crop_r = 0.1
-    # cloth_seg[: int(crop_r * h), :] = 0
+    cloth_seg[cloth_seg < 80] = 0
+    crop_r = 0.1#zeros out the border to remove robot
     cloth_seg[:, : int(crop_r * w)] = 0
     cloth_seg[int((1 - 2 * crop_r) * h) :, :] = 0
     cloth_seg[:, int((1 - crop_r) * w) :] = 0
     cloth_seg[cloth_seg != 0] = 255
     coords = sample_cloth_point(cloth_seg)
-    # com = find_center_of_mass(cloth_seg)
-    # coords = (int(com[1]), int(com[0]))
     grasp = g.top_down_grasp(coords, 0.02, iface.R_TCP)
-    grasp.pose.translation[2] = 0.035
+    grasp.pose.translation[2] = 0.04
     grasp.speed = (0.3, np.pi)
     iface.grasp(r_grasp=grasp)
+    iface.sync()
     iface.go_delta_single("right", [0, 0, 0.05], reltool=False)
     dx, dy = np.random.uniform((-0.1, -0.1), (0.1, 0.1))
     iface.go_pose("left", l_p([0.4 + dx, 0 + dy, 0.3]), linear=False)
     iface.sync()
-    iface.shake_right_J([1], 3)
+    iface.shake_J('right',[1],1)
     iface.open_gripper("right")
     iface.home()
     iface.sync()
 
 
 if __name__ == "__main__":
-
     if not osp.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
-    zed = ZedImageCapture()
+    zed = ZedImageCapture(resolution=RES)
     plug = Plug()
     iface = Interface(speed=(0.6, 4 * np.pi))
     iface.open_grippers()
@@ -174,17 +169,15 @@ if __name__ == "__main__":
     iface.sync()
     idx = START_ID
     while idx < N_COLLECT:
-        reset_cloth(iface)
-        print(idx)
+        if AUTOMATIC:
+            reset_cloth(iface)
+        else:
+            input("Enter to take a pic")
+        print(f"Taking image {idx}")
         plug.turn_off()
         iml, imr = get_rgb(zed)
-        # plt.imshow(iml); plt.show()
-        # plt.imshow(imr); plt.show()
         ml, mr, iml_uv, imr_uv, imd = get_segmasks(zed, plug, color="green", plot=True)
-        # plt.imshow(img[:,:,0]); plt.show()
 
-        # action = input("Enter s to save image, q to discard image.")
-        # if action == 's':
         print("WARNING, SAVING iMAGES DISABLED")
         # Image.fromarray(iml_uv).save(osp.join(OUTPUT_DIR, "imagel_uv_%d.png" % idx))
         # Image.fromarray(imr_uv).save(osp.join(OUTPUT_DIR, "imager_uv_%d.png" % idx))

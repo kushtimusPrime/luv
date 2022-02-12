@@ -27,18 +27,22 @@ def get_task_parameters(params):
 		params['num_classes'] = 2
 		params['loss'] = SegmentationLoss()
 		try:
-			params['dataset'] = KPVectorDataset(dataset_dir="data/cable_kp_vecs")
-			params['dataset_val'] = KPVectorDataset(dataset_dir="data/cable_kp_vecs", val=True)
+			params['dataset'] = KPVectorDataset(dataset_dir=params['dataset_dir'])
+			params['dataset_val'] = KPVectorDataset(dataset_dir=params['dataset_dir'], val=True)
 		except:
 			pass # in case datasets aren't on the machine (for testing)
 	elif params['task'] == "cable_slide":
 		params['num_classes'] = 1
 		params['loss'] = SegmentationLoss()
 		try:
-			params['dataset'] = KPDataset(dataset_dir="data/cable_slide")
-			params['dataset_val'] = KPDataset(dataset_dir="data/cable_slide", val=True)
+			params['dataset'] = KPDataset(dataset_dir=params['dataset_dir'])
+			params['dataset_val'] = KPDataset(dataset_dir=params['dataset_dir'], val=True)
 		except:
 			pass # in case datasets aren't on the machine (for testing)
+	elif params['task']=="segmentation":
+		params['loss'] = SegmentationLoss()
+		params['dataset'] = StereoSegDataset(dataset_dir=params['dataset_dir'],max_size=params['max_size'])
+		params['dataset_val'] = StereoSegDataset(dataset_dir=params['dataset_dir'],val=True,max_size=params['max_size'])
 
 	else:
 		raise Exception("Task not supported.")

@@ -1,58 +1,50 @@
-########################################################################
-#
-# Copyright (c) 2021, STEREOLABS.
-#
-# All rights reserved.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-########################################################################
-
-import pyzed.sl as sl
 import matplotlib.pyplot as plt
+import os
+from fcvision.arg_utils import parse_args
+import fcvision.run_utils as ru
+from fcvision.kp_wrapper import SegNetwork
+from fcvision.zed import ZedImageCapture
+from autolab_core import DepthImage
+import open3d
+import numpy as np
+import time
 
+def get_rgb(zed):
+	iml,imr=zed.capture_image()
+	return iml,imr
 
 def main():
-    # Create a Camera object
-    zed = sl.Camera()
+	visdepth=False
+	# params = parse_args()
+	# logdir = ru.get_file_prefix(params)
+	# os.makedirs(os.path.join(logdir, 'lightning_logs'))
+	# model = SegNetwork(params['checkpoint'], params=params, logdir=logdir)
+	zed = ZedImageCapture(resolution='2K')
+	time.sleep(.5)
 
-    # Create a InitParameters object and set configuration parameters
-    init_params = sl.InitParameters()
-    init_params.camera_resolution = sl.RESOLUTION.HD1080  # Use HD1080 video mode
-    init_params.camera_fps = 30  # Set fps at 30
+	for idx in range(10):
+		iml, imr = get_rgb(zed)
+		if visdepth:
+			iml,imr,depth=zed.capture_image(True)
+			dimg=DepthImage(depth,'zed')
+			pc=zed.intrinsics.deproject(dimg)
+			pc.remove_infinite_points()
+			pc.remove_zero_points()
+			q:open3d.PointCloud=open3d.geometry.PointCloud(open3d.utility.Vector3dVector((pc.data).T))
+			print(np.asarray(o3dpc.points)[:100,:])
+			open3d.visualization.draw_geometries([o3dpc])
+		# predl = model(iml, mode='seg')
+		# predr = model(imr, mode='seg')
 
-    # Open the camera
-    err = zed.open(init_params)
-    if err != sl.ERROR_CODE.SUCCESS:
-        exit(1)
 
-    # Capture 50 frames and stop
-    i = 0
-    image = sl.Mat()
-    runtime_parameters = sl.RuntimeParameters()
-    while i < 50:
-        # Grab an image, a RuntimeParameters object must be given to grab()
-        if zed.grab(runtime_parameters) == sl.ERROR_CODE.SUCCESS:
-            # A new image is available if grab() returns SUCCESS
-            zed.retrieve_image(image, sl.VIEW.LEFT)
-            timestamp = zed.get_timestamp(sl.TIME_REFERENCE.CURRENT)  # Get the timestamp at the time the image was captured
-            print("Image resolution: {0} x {1} || Image timestamp: {2}\n".format(image.get_width(), image.get_height(),
-                  timestamp.get_milliseconds()))
-            i = i + 1
-        plt.imshow(image.get_data()[:,:,:]); plt.show()
+		_,axs=plt.subplots(2,2)
+		axs[0,0].imshow(iml)
+		axs[0,1].imshow(imr)
+		# axs[1,1].imshow(hsv_right)
+		# axs[1,0].imshow(predl)
+		# axs[1,1].imshow(predr)
+		plt.show()
+		
 
-    # Close the camera
-    zed.close()
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+	main()

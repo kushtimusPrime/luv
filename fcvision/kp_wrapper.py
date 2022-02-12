@@ -128,40 +128,15 @@ class SegNetwork:
 
 
     def _prepare_image(self, img):
-        im = np.copy(img)
+        im = np.copy(img)/255.
         im = np.transpose(im, (2, 0, 1))
         im = ptu.torchify(im,device='cuda')
         im = torch.unsqueeze(im, 0)
         return im
 
 
-    def __call__(self, img, mode='kp'):
+    def __call__(self, img):
         img = self._prepare_image(img)
         with torch.no_grad():
             pred = torch.sigmoid(self.model(img))[0, 0].cpu().numpy()
-            # plt.imshow(img.squeeze().permute(1, 2, 0).numpy())
-            # plt.show()
-            # plt.imshow(pred)
-            # plt.show()
-        if mode == 'kp':
-            coords = find_peaks(pred)
-
-            masked_image = get_cable_mask(orig_img)
-            plt.imshow(masked_image)
-            plt.show()
-
-            if coords == []:
-                # if we can't find any real endpoints, trace along outside of image to see if cable overflows, use these as endpoints
-                if np.max(masked_image[50]) > 0:
-                    coords += [(50, np.argmax(masked_image[50]))]
-                if np.max(masked_image[640]) > 0:
-                    coords += [(640, np.argmax(masked_image[640]))]
-                if np.max(masked_image[:, 150]) > 0:
-                    coords += [(np.argmax(masked_image[:, 150]), 0)]
-                if np.max(masked_image[:, 940]) > 0:
-                    coords += [(np.argmax(masked_image[:, 940]), 940)]
-
-            return coords
-        else:
-            return pred
-
+        return pred
