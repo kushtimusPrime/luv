@@ -26,8 +26,8 @@ def main():
 		im = torch.unsqueeze(dataset_val[idx], 0).cuda()
 		with torch.no_grad():
 			pred = model(im)[0, 0].cpu().numpy()
-		im = Image.fromarray(pred)
-		im.save(osp.join(logdir, "vis", "image_%d.jpg"%idx))
+		im = Image.fromarray(pred).convert("L")
+		im.save(osp.join(logdir, "vis", "pred_%d.jpg"%idx))
 
 
 if __name__ == '__main__':
