@@ -8,7 +8,7 @@ from fcvision.learning.model import build_PL_model
 
 def parse_yaml(fname):
     ret = {}
-    with open(fname, 'r') as file:
+    with open(fname, "r") as file:
         cfg = yaml.safe_load(file)
 
     if "dataset" in cfg:
@@ -31,7 +31,9 @@ def parse_yaml(fname):
         ret["experiment"] = cfg["experiment"]
     if "test" in cfg:
         assert "train" not in cfg
-        pl_model = build_PL_model(cfg["test"], train=False, loss=None, checkpoint=cfg["test"]["checkpoint"])
+        pl_model = build_PL_model(
+            cfg["test"], train=False, loss=None, checkpoint=cfg["test"]["checkpoint"]
+        )
         ret["model"] = pl_model
         ret["seed"] = cfg["test"]["seed"]
         if "wrapper" in cfg["test"]:

@@ -27,7 +27,7 @@ def target_transforms(image, target):
         angle = random.randint(0, 90)
         translate = list(np.random.uniform(0.1, 0.3, 2))
         scale = np.random.uniform(0.75, 0.99)
-        image =  TF.affine(image, angle, translate, scale, [0, 0])
+        image = TF.affine(image, angle, translate, scale, [0, 0])
         target = TF.affine(target, angle, translate, scale, [0, 0])
     if random.random() > 0.8:
         image = TF.hflip(image)
@@ -63,8 +63,6 @@ class FCDataset:
             self.image_fnames = self.image_fnames[10:]
         self.mask_fnames = [f.replace("image", "target") for f in self.image_fnames]
 
-
-
     def __getitem__(self, idx):
         im_file = self.image_fnames[idx]
         target_file = self.mask_fnames[idx]
@@ -75,7 +73,7 @@ class FCDataset:
         im = np.transpose(im, (2, 0, 1))
 
         if len(target.shape) == 2:
-            target = target[np.newaxis,:,:]
+            target = target[np.newaxis, :, :]
 
         if self.transform:
             im, target = target_transforms(im, target)
@@ -83,7 +81,6 @@ class FCDataset:
         if self.val:
             return ptu.torchify(im)
         return ptu.torchify(im, target)
-
 
     def __len__(self):
         return len(self.image_fnames)
