@@ -27,7 +27,7 @@ def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
         params = {
             "num_classes": cfg["num_classes"],
         }
-        return PlModel.load_from_checkpoint(params['checkpoint'], params=params).eval().cuda()
+        return PlModel.load_from_checkpoint(checkpoint, params=params).eval().cuda()
 
 class PlModel(pl.LightningModule):
 
