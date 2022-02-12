@@ -19,7 +19,9 @@ def main():
 
     logdir = ru.get_file_prefix(params)
     os.makedirs(os.path.join(logdir, 'lightning_logs'))
-    params["model"].logdir = logdir
+
+    model = params["train"]["model"]
+    model.logdir = logdir
 
     if params['seed'] != -1:
         pl.seed_everything(params['seed'])
@@ -36,7 +38,7 @@ def main():
         callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, 'models'))]
         # plugins=pl.plugins.training_type.ddp.DDPPlugin(find_unused_parameters=False),
     )
-    trainer.fit(params["model"], loader, loader_val)
+    trainer.fit(model, loader, loader_val)
 
 
 
