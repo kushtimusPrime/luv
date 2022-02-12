@@ -9,7 +9,7 @@ from fcvision.utils.arg_utils import parse_yaml
 def main():
     cfg, params = parse_yaml(osp.join("cfg", "apps", "phoxi_test.yaml"))
     cam = ret["camera"]
-    img = cam.capture()._data
+    img = cam.capture_image()._data
     for i in range(4):
         plt.imshow(img[:,:,i]); plt.show()
 

@@ -1,4 +1,3 @@
-from autolab_core import RigidTransform
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -12,7 +11,7 @@ from fcvision.plug import Plug
 from fcvision.zed import ZedImageCapture
 
 N_COLLECT = 1000
-START_ID = 137
+START_ID = 0
 OUTPUT_DIR = "data/cable_uv_endpoint_images"
 
 colors = {
@@ -31,97 +30,24 @@ def get_rgb(zed):
 
 
 def get_segmasks(zed, plug, color='blue', plot=True):
-	if color == 'red':
-		zed.set_exposure(10)
-		plug.turn_on()
-		time.sleep(1)
-		img_left, img_right, img_depth = zed.capture_image(depth=True)
-		plug.turn_off()
-		img_left = img_left[:,:,::-1]
-		img_right = img_right[:,:,::-1]
-		# plt.imshow(img_left[:,:,::-1]); plt.show(); assert 0
-		hsv_left = cv2.cvtColor(img_left,cv2.COLOR_RGB2HSV)
-		hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
-		# if plot:
-		# 	_,axs=plt.subplots(3,2)
-		# 	axs[0,0].imshow(img_left)
-		# 	axs[0,1].imshow(img_right)
-		# 	axs[1,0].imshow(hsv_left)
-		# 	axs[1,1].imshow(hsv_right)
-		# 	plt.show()
+	zed.set_exposure(10)
+	plug.turn_on()
+	time.sleep(1)
+	img_left, img_right, img_depth = zed.capture_image(depth=True)
+	plug.turn_off()
+	img_left = img_left[:,:,::-1]
+	img_right = img_right[:,:,::-1]
+	hsv_left = cv2.cvtColor(img_left,cv2.COLOR_RGB2HSV)
+	hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
 
 
-		lower1, upper1 = colors[color]
-		lower2, upper2 = (np.array([160, 50, 150]), np.array([180, 255, 255]))
+	lower1, upper1 = colors[color]
 
-		lower_mask = cv2.inRange(np.copy(hsv_left), lower1, upper1)
-		upper_mask = cv2.inRange(np.copy(hsv_left), lower2, upper2)
-		mask_left = lower_mask + upper_mask
+	lower_mask = cv2.inRange(hsv_left, lower1, upper1)
+	mask_left = lower_mask
 
-		lower_mask = cv2.inRange(np.copy(hsv_left), lower1, upper1)
-		upper_mask = cv2.inRange(np.copy(hsv_left), lower2, upper2)
-		mask_right = lower_mask + upper_mask
-		# upper boundary RED color range values; Hue (160 - 180)
-
-
-
-		zed.set_exposure(30)
-		plug.turn_on()
-		time.sleep(1)
-		img_left, img_right, img_depth = zed.capture_image(depth=True)
-		plug.turn_off()
-		img_left = img_left[:,:,::-1]
-		img_right = img_right[:,:,::-1]
-		# plt.imshow(img_left[:,:,::-1]); plt.show(); assert 0
-		hsv_left = cv2.cvtColor(img_left,cv2.COLOR_RGB2HSV)
-		hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
-		# if plot:
-		# 	_,axs=plt.subplots(3,2)
-		# 	axs[0,0].imshow(img_left)
-		# 	axs[0,1].imshow(img_right)
-		# 	axs[1,0].imshow(hsv_left)
-		# 	axs[1,1].imshow(hsv_right)
-		# 	plt.show()
-
-
-		lower1, upper1 = (np.array([0, 180, 150]), np.array([20, 255, 255]))
-		lower2, upper2 = (np.array([160, 180, 150]), np.array([180, 255, 255]))
-
-		lower_mask = cv2.inRange(np.copy(hsv_left), lower1, upper1)
-		upper_mask = cv2.inRange(np.copy(hsv_left), lower2, upper2)
-		mask_left = lower_mask + upper_mask + mask_left
-
-		lower_mask = cv2.inRange(np.copy(hsv_left), lower1, upper1)
-		upper_mask = cv2.inRange(np.copy(hsv_left), lower2, upper2)
-		mask_right = lower_mask + upper_mask + mask_right
-		# upper boundary RED color range values; Hue (160 - 180)
-
-
-	else:
-		zed.set_exposure(10)
-		plug.turn_on()
-		time.sleep(1)
-		img_left, img_right, img_depth = zed.capture_image(depth=True)
-		plug.turn_off()
-		img_left = img_left[:,:,::-1]
-		img_right = img_right[:,:,::-1]
-		# plt.imshow(img_left[:,:,::-1]); plt.show(); assert 0
-		hsv_left = cv2.cvtColor(img_left,cv2.COLOR_RGB2HSV)
-		hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
-
-
-		lower1, upper1 = colors[color]
-
-		lower_mask = cv2.inRange(hsv_left, lower1, upper1)
-		# upper_mask = cv2.inRange(hsv_left, lower2, upper2)
-		mask_left = lower_mask
-
-		lower_mask = cv2.inRange(hsv_right, lower1, upper1)
-		# upper_mask = cv2.inRange(hsv_right, lower2, upper2)
-		mask_right = lower_mask
-
-	# mask_left = remove_small_blobs(mask_left)
-	# mask_right = remove_small_blobs(mask_right)
+	lower_mask = cv2.inRange(hsv_right, lower1, upper1)
+	mask_right = lower_mask
 
 	if plot:
 		_,axs=plt.subplots(3,2)
@@ -140,8 +66,10 @@ if __name__ == '__main__':
 
 	if not osp.exists(OUTPUT_DIR):
 		os.mkdir(OUTPUT_DIR)
-	zed = ZedImageCapture()
-	plug = Plug()
+    cfg, params = parse_yaml(osp.join("cfg", "apps", "uv_data_collection.yaml"))
+
+	zed = params["camera"]
+	plug = params["plug"]
 
 	idx = START_ID
 	while idx < N_COLLECT:
@@ -153,15 +81,14 @@ if __name__ == '__main__':
 		# plt.imshow(iml); plt.show()
 		# plt.imshow(imr); plt.show()
 		ml, mr, iml_uv, imr_uv, imd = get_segmasks(zed, plug, color='red', plot=False)
-		# plt.imshow(img[:,:,0]); plt.show()
 
-		# action = input("Enter s to save image, q to discard image.")
-		# if action == 's':
-		Image.fromarray(iml_uv).save(osp.join(OUTPUT_DIR, "imagel_uv_%d.png"%idx))
-		Image.fromarray(imr_uv).save(osp.join(OUTPUT_DIR, "imager_uv_%d.png"%idx))
-		Image.fromarray(iml).save(osp.join(OUTPUT_DIR, "imagel_%d.png"%idx))
-		Image.fromarray(imr).save(osp.join(OUTPUT_DIR, "imager_%d.png"%idx))
-		np.save(osp.join(OUTPUT_DIR, "image_depth_%d.npy"%idx), imd)
-		Image.fromarray(ml).save(osp.join(OUTPUT_DIR, "maskl_%d.png"%idx))
-		Image.fromarray(mr).save(osp.join(OUTPUT_DIR, "maskr_%d.png"%idx))
-		idx += 1
+		action = input("Enter s to save image, q to discard image.")
+			if action == 's':
+				Image.fromarray(iml_uv).save(osp.join(OUTPUT_DIR, "imagel_uv_%d.png"%idx))
+				Image.fromarray(imr_uv).save(osp.join(OUTPUT_DIR, "imager_uv_%d.png"%idx))
+				Image.fromarray(iml).save(osp.join(OUTPUT_DIR, "imagel_%d.png"%idx))
+				Image.fromarray(imr).save(osp.join(OUTPUT_DIR, "imager_%d.png"%idx))
+				np.save(osp.join(OUTPUT_DIR, "image_depth_%d.npy"%idx), imd)
+				Image.fromarray(ml).save(osp.join(OUTPUT_DIR, "maskl_%d.png"%idx))
+				Image.fromarray(mr).save(osp.join(OUTPUT_DIR, "maskr_%d.png"%idx))
+				idx += 1
