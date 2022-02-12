@@ -20,7 +20,7 @@ def load_yaml(fname):
 def load_yaml_recursive(cfg):
     for k, v in cfg.items():
         if isinstance(v, str) and ".yaml" in v:
-            cfg[k] = load_yaml(v)
+            cfg[k] = load_yaml(v)[k]
         if isinstance(v, dict):
             load_yaml_recursive(cfg[k])
     return cfg
