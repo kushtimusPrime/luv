@@ -11,15 +11,13 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fcvision.dataset import KPDataset
-from fcvision.model import PlModel
-from fcvision.arg_utils import parse_args
-from fcvision.vision_utils import find_peaks, get_cable_mask
+from fcvision.learning.dataset import KPDataset
+from fcvision.learning.model import PlModel
+from fcvision.utils.arg_utils import parse_args
+from fcvision.utils.vision_utils import find_peaks, get_cable_mask
 from matplotlib.patches import Circle
-from fcvision.phoxi import prepare_phoxi_image_for_net
-import fcvision.pytorch_utils as ptu
-from fcvision.tasks import get_task_parameters
-import fcvision.pytorch_utils as ptu
+from fcvision.cameras.phoxi import prepare_phoxi_image_for_net
+import fcvision.utils.pytorch_utils as ptu
 import time
 
 

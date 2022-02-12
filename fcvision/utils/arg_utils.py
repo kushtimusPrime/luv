@@ -1,9 +1,9 @@
 from argparse import ArgumentParser
 import yaml
 
-from fcvision.dataset import build_dataset
-from fcvision.losses import build_loss
-from fcvision.model import build_PL_model
+from fcvision.learning.dataset import build_dataset
+from fcvision.learning.losses import build_loss
+from fcvision.learning.model import build_PL_model
 
 
 def parse_yaml(fname):

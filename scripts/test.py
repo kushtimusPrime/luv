@@ -1,13 +1,7 @@
 import os
 import os.path as osp
-import torch
-from pytorch_lightning.callbacks import ModelCheckpoint
-import matplotlib.pyplot as plt
-import numpy as np
 from PIL import Image
 
-
-from fcvision.model import PlModel
 import fcvision.utils.run_utils as ru
 from fcvision.utils.arg_utils import parse_yaml
 

@@ -12,7 +12,7 @@ import os
 from torchvision.models.segmentation import fcn_resnet50
 from torchvision.utils import save_image
 
-from fcvision.losses import *
+from fcvision.learning.losses import *
 
 
 def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
