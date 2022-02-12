@@ -34,4 +34,6 @@ def parse_yaml(fname):
         pl_model = build_PL_model(cfg["test"], train=False, loss=None, checkpoint=cfg["test"]["checkpoint"])
         ret["model"] = pl_model
         ret["seed"] = cfg["test"]["seed"]
+        if "wrapper" in cfg["test"]:
+            ret["model"] = build_model_wrapper(cfg["test"], pl_model)
     return cfg, ret

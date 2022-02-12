@@ -1,7 +1,3 @@
-dataset:
-  dataset_dir: "data/cable_seg"
-  val: False
-  transform: True
 dataset_val:
   dataset_dir: "data/cable_seg"
   val: True

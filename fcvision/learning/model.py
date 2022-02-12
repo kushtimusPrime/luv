@@ -30,6 +30,7 @@ def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
         }
         return PlModel.load_from_checkpoint(checkpoint, params=params).eval().cuda()
 
+
 class PlModel(pl.LightningModule):
 
     def __init__(self, params, logdir=None):
