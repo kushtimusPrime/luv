@@ -25,6 +25,7 @@ def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
         return PlModel(params)
     else:
         params = {
+            "loss": None,
             "num_classes": cfg["num_classes"],
         }
         return PlModel.load_from_checkpoint(checkpoint, params=params).eval().cuda()
