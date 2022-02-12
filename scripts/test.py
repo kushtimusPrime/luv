@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from fcvision.model import PlModel
-import fcvision.run_utils as ru
+import fcvision.utils.run_utils as ru
 
 
 def main():
