@@ -1,0 +1,12 @@
+camera:
+  name: "ZedImageCapture"
+  params:
+    resolution: "2K"
+    brightness: -1,
+    contrast: -1,
+    hue: -1,
+    saturation: -1,
+    sharpness: -1,
+    gain: -1,
+    exposure: -1,
+    whitebalance_temp: -1,
