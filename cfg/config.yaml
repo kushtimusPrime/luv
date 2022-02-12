@@ -15,5 +15,5 @@ train:
     optim_learning_rate: 0.002
   num_classes: 1
   seed: -1
-  loader-n-workers: 4
+  loader_n_workers: 4
 experiment: "cable_segmentation"
