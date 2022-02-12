@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
+from abc import ABCMeta, abstractmethod
 
 from fcvision.utils.vision_utils import find_peaks
 
@@ -17,8 +18,14 @@ def prepare_image(img):
     return im
 
 
-# TODO: clean up this class
-class KeypointNetwork:
+class ModelWrapper(metaclass=ABCMeta):
+
+    @abstractmethod
+    def __call__(self, img):
+        pass
+
+
+class KeypointNetwork(ModelWrapper):
     def __init__(self, model):
         self.model = model
 
@@ -34,7 +41,7 @@ class KeypointNetwork:
             return pred
 
 
-class SegNetwork:
+class SegNetwork(ModelWrapper):
     def __init__(self, model):
         self.model = model
 

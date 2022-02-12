@@ -4,12 +4,28 @@ import yaml
 from fcvision.learning.dataset import build_dataset
 from fcvision.learning.losses import build_loss
 from fcvision.learning.model import build_PL_model
+from fcvision.cameras import build_camera
+
+
+def load_yaml(fname):
+    with open(fname, "r") as file:
+        cfg = yaml.safe_load(file)
+    return cfg
+
+
+def load_yaml_recursive(cfg):
+    for k, v in cfg.items():
+        if isinstance(v, str) and ".yaml" in v:
+            cfg[k] = load_yaml(v)
+        if isinstance(v, dict):
+            load_yaml_recursive(cfg[k])
+    return cfg
 
 
 def parse_yaml(fname):
     ret = {}
-    with open(fname, "r") as file:
-        cfg = yaml.safe_load(file)
+    cfg = load_yaml(fname)
+    cfg = load_yaml_recursive(cfg)
 
     if "dataset" in cfg:
         dataset = build_dataset(cfg["dataset"])
@@ -38,4 +54,7 @@ def parse_yaml(fname):
         ret["seed"] = cfg["test"]["seed"]
         if "wrapper" in cfg["test"]:
             ret["model"] = build_model_wrapper(cfg["test"], pl_model)
+    if "camera" in cfg:
+        camera = build_camera(cfg["camera"])
+        ret["camera"] = camera
     return cfg, ret

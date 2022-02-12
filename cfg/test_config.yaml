@@ -1,9 +1,0 @@
-dataset_val:
-  dataset_dir: "data/cable_seg"
-  val: True
-  transform: True
-test:
-  num_classes: 1
-  seed: -1
-  checkpoint: "outputs/2022-02-11/17-43-09/models/epoch=199-step=13799.ckpt"
-experiment: "cable_segmentation_test"

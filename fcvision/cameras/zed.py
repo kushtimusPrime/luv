@@ -27,7 +27,6 @@ class ZedImageCapture:
         # Set sensing mode in FILL
         # runtime_parameters = sl.RuntimeParameters()
         # runtime_parameters.sensing_mode = sl.SENSING_MODE.FILL
-
         self.zed = sl.Camera()
 
         assert (

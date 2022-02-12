@@ -7,7 +7,7 @@ import torch
 
 
 class Phoxi:
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.cam = PhoXiSensor("1703005")
         self.cam.start()
         img = self.cam.read()

@@ -7,7 +7,7 @@ from fcvision.utils.arg_utils import parse_yaml
 
 
 def main():
-	cfg, params = parse_yaml(osp.join("cfg", "test_config.yaml"))
+	cfg, params = parse_yaml(osp.join("cfg", "apps", "test_config.yaml"))
 
 	logdir = ru.get_file_prefix(params)
 	os.makedirs(os.path.join(logdir, 'vis'))
