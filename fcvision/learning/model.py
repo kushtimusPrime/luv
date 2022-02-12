@@ -37,7 +37,15 @@ class PlModel(pl.LightningModule):
 
         self.save_hyperparameters()
         self.params = params
+        self.set_logdir(logdir)
 
+
+        self.model = fcn_resnet50(
+            pretrained=False, progress=False, num_classes=params["num_classes"]
+        )
+        self.loss_fn = params["loss"]
+
+    def set_logdir(self, logdir):
         if logdir is not None:
             self.vis_dir = os.path.join(logdir, "vis")
             self.vis_counter = 0
@@ -48,11 +56,6 @@ class PlModel(pl.LightningModule):
         else:
             self.vis_dir = None
             self.vis_counter = None
-
-        self.model = fcn_resnet50(
-            pretrained=False, progress=False, num_classes=params["num_classes"]
-        )
-        self.loss_fn = params["loss"]
 
     def forward(self, img):
         encoding_dict = self.model(img)
@@ -92,7 +95,7 @@ class PlModel(pl.LightningModule):
             save_image(im, os.path.join(self.vis_dir, "%d_%d_im.png" % (idx, j)))
             save_image(pred, os.path.join(self.vis_dir, "%d_%d_pred.png" % (idx, j)))
             save_image(
-                pred, os.path.join(self.vis_dir, "%d_%d_overlayed.png" % (idx, j))
+                pred + im, os.path.join(self.vis_dir, "%d_%d_overlayed.png" % (idx, j))
             )
 
     def configure_optimizers(self):
