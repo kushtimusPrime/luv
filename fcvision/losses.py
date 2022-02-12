@@ -12,14 +12,18 @@ from torchvision.models.segmentation import fcn_resnet50
 from torchvision.utils import save_image
 
 
+def build_loss(loss_cfg):
+  loss_class = globals()[loss_cfg["name"]]
+  return loss_class()
+  
 
 class SegmentationLoss(nn.Module):
 
     def __init__(self):
-        super().__init__()
+      super().__init__()
 
     def forward(self, preds, targets):
-        return F.binary_cross_entropy_with_logits(preds, targets)
+      return F.binary_cross_entropy_with_logits(preds, targets)
 
 
 class MaskedMSELoss(nn.Module):

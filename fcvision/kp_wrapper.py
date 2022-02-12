@@ -14,7 +14,6 @@ import numpy as np
 from fcvision.dataset import KPDataset
 from fcvision.model import PlModel
 from fcvision.arg_utils import parse_args
-import fcvision.run_utils as ru
 from fcvision.vision_utils import find_peaks, get_cable_mask
 from matplotlib.patches import Circle
 from fcvision.phoxi import prepare_phoxi_image_for_net

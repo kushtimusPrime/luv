@@ -14,20 +14,18 @@ from torchvision.utils import save_image
 
 from fcvision.losses import *
 
-class AddGaussianNoise(object):
-    def __init__(self, mean=0., std=0.25):
-        self.std = std
-        self.mean = mean
-        
-    def __call__(self, tensor):
-        return tensor + torch.randn(tensor.size()).to(tensor.device) * self.std + self.mean
-    
-    def __repr__(self):
-        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
+
+def build_PL_model(cfg, loss):
+    params = {
+        "num_classes": cfg["num_classes"],
+        "loss": loss,
+        "optim_learning_rate": cfg["optim_learning_rate"]
+    }
+    return PlModel(params)
 
 class PlModel(pl.LightningModule):
 
-    def __init__(self, params=None, logdir=None):
+    def __init__(self, params, logdir=None):
         super().__init__()
 
         self.save_hyperparameters()
@@ -45,33 +43,17 @@ class PlModel(pl.LightningModule):
             self.vis_counter = None
 
         self.model = fcn_resnet50(pretrained=False, progress=False, num_classes=params['num_classes'])
-
         self.loss_fn = params['loss']
 
-        t1 = torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.3, saturation=0.3, hue=0.15)
-        t2 = torchvision.transforms.GaussianBlur(9, sigma=(1, 10.0))
-        t3 = torchvision.transforms.RandomErasing(p=0.7, scale=(0.02, 0.1), ratio=(0.3, 3.3), value=0, inplace=False)
-        t4 = AddGaussianNoise()
-        t5 = None # No transformation
-        self.transforms = [t5]
-        # self.segmask_head = DPCVSegMaskHead(params)
 
     def forward(self, img):
-        # print(img_left.dtype)
         encoding_dict = self.model(img)
         out = encoding_dict['out']
         return out
 
-    def transform(self, im):
-        transform = random.choice(self.transforms)
-        if transform is not None:
-            img_width = im.shape[2]
-            im = transform(im)
-        return im
 
     def training_step(self, batch, batch_idx):
         ims, targets = batch
-        ims = self.transform(ims)
 
         preds = self(ims)
 
@@ -79,10 +61,12 @@ class PlModel(pl.LightningModule):
         self.log('Loss', loss_sm, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss_sm
 
+
     def validation_step(self, batch, batch_idx):
         ims = batch
         preds = self(ims)
         return {'ims': ims, 'preds': preds}
+
 
     def validation_epoch_end(self, outputs):
         if self.vis_dir is None:
@@ -106,4 +90,3 @@ class PlModel(pl.LightningModule):
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.params['optim_learning_rate'])
         return optimizer
-

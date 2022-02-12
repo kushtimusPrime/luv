@@ -1,7 +1,8 @@
 from fcvision.losses import *
-from fcvision.dataset import KPDataset, StereoSegDataset, CableSegDataset, KPVectorDataset
+# from fcvision.dataset import KPDataset, StereoSegDataset, CableSegDataset, KPVectorDataset
 
 def get_task_parameters(params):
+	assert 0
 	if params['task'] == "cloth":
 		params['loss'] = KPVectorLoss()
 		params['num_classes'] = 1
