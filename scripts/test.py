@@ -7,6 +7,7 @@ import numpy as np
 
 from fcvision.model import PlModel
 import fcvision.utils.run_utils as ru
+from fcvision.utils.arg_utils import parse_yaml
 
 
 def main():
