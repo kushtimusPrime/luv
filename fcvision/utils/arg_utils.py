@@ -1,30 +1,9 @@
 from argparse import ArgumentParser
 import yaml
 
-from fcvision.tasks import get_task_parameters
 from fcvision.dataset import build_dataset
 from fcvision.losses import build_loss
 from fcvision.model import build_PL_model
-
-def parse_args():
-    parser = ArgumentParser()
-
-    parser.add_argument('--exper-name', default=None)
-    parser.add_argument('--seed', type=int, default=-1)
-    parser.add_argument('--n-gpus', type=int, default=1)
-    parser.add_argument('--loader-n-workers', type=int, default=4)
-    parser.add_argument('--epochs', type=int, default=200)
-    parser.add_argument('--checkpoint', type=str, default=None)
-    parser.add_argument('--task', type=str, default="cable_endpoints")
-
-    optim_group = parser.add_argument_group("optim")
-    optim_group.add_argument("--optim-learning-rate", default=0.002, type=float)
-
-    args = parser.parse_args()
-    args = vars(args)
-    args = get_task_parameters(args)
-
-    return args
 
 
 def parse_yaml(fname):
