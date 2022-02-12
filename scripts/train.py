@@ -20,7 +20,7 @@ def main():
     logdir = ru.get_file_prefix(params)
     os.makedirs(os.path.join(logdir, 'lightning_logs'))
 
-    model = params["train"]["model"]
+    model = params["model"]
     model.logdir = logdir
 
     if params['seed'] != -1:
