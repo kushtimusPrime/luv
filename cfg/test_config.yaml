@@ -1,0 +1,15 @@
+dataset:
+  name: "FCDataset"
+  dataset_dir: "data/cable_seg"
+  val: False
+  transform: True
+dataset_val:
+  name: "FCDataset"
+  dataset_dir: "data/cable_seg"
+  val: True
+  transform: True
+test:
+  num_classes: 1
+  seed: -1
+  checkpoint: "test"
+experiment: "cable_segmentation_test"
