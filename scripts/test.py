@@ -4,6 +4,8 @@ import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import numpy as np
+from PIL import Image
+
 
 from fcvision.model import PlModel
 import fcvision.utils.run_utils as ru
@@ -24,7 +26,8 @@ def main():
 		im = torch.unsqueeze(dataset_val[idx][0], 0).cuda()
 		with torch.no_grad():
 			pred = model(im)[0, 0].cpu().numpy()
-		print(pred.shape)
+		im = Image.fromarray(pred)
+		im.save(osp.join("logdir", "vis", "image_%d.jpg"%idx))
 
 
 if __name__ == '__main__':
