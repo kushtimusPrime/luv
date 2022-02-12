@@ -45,6 +45,8 @@ def parse_yaml(fname):
         ret["model"] = pl_model
         ret["seed"] = cfg["train"]["seed"]
         ret["loader_n_workers"] = cfg["train"]["loader_n_workers"]
+        ret["n_gpus"] = cfg["train"]["n_gpus"]
+        ret["epochs"] = cfg["train"]["epochs"]
     if "experiment" in cfg:
         ret["experiment"] = cfg["experiment"]
 

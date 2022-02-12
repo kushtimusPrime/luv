@@ -16,4 +16,6 @@ train:
   num_classes: 1
   seed: -1
   loader_n_workers: 4
+  n_gpus: 1
+  epochs: 200
 experiment: "cable_segmentation"
