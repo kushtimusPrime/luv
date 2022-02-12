@@ -33,5 +33,5 @@ def parse_yaml(fname):
         assert "train" not in cfg
         pl_model = build_PL_model(cfg["test"], train=False, loss=None, checkpoint=cfg["test"]["checkpoint"])
         ret["model"] = pl_model
-        ret["seed"] = cfg["train"]["seed"]
+        ret["seed"] = cfg["test"]["seed"]
     return cfg, ret
