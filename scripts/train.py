@@ -19,16 +19,15 @@ def main():
 
     logdir = ru.get_file_prefix(params)
     os.makedirs(os.path.join(logdir, 'lightning_logs'))
+    params["model"].logdir = logdir
 
-    if ret['seed'] != -1:
+    if params['seed'] != -1:
         pl.seed_everything(params['seed'])
         np.random.seed(params['seed'])
 
     batch_size = 2
     loader = DataLoader(params['dataset'], batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(params['dataset_val'], batch_size=12, num_workers=params['loader_n_workers'])
-
-    model = PlModel(params, logdir)
 
     trainer = pl.Trainer(
         default_root_dir=logdir,
@@ -37,7 +36,7 @@ def main():
         callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, 'models'))]
         # plugins=pl.plugins.training_type.ddp.DDPPlugin(find_unused_parameters=False),
     )
-    trainer.fit(model, loader, loader_val)
+    trainer.fit(params["model"], loader, loader_val)
 
 
 
