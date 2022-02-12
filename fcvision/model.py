@@ -15,13 +15,19 @@ from torchvision.utils import save_image
 from fcvision.losses import *
 
 
-def build_PL_model(cfg, loss):
-    params = {
-        "num_classes": cfg["num_classes"],
-        "loss": loss,
-        "optim_learning_rate": cfg["optimizer"]["optim_learning_rate"]
-    }
-    return PlModel(params)
+def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
+    if train:
+        params = {
+            "num_classes": cfg["num_classes"],
+            "loss": loss,
+            "optim_learning_rate": cfg["optimizer"]["optim_learning_rate"]
+        }
+        return PlModel(params)
+    else:
+        params = {
+            "num_classes": cfg["num_classes"],
+        }
+        return PlModel.load_from_checkpoint(params['checkpoint'], params=params).eval().cuda()
 
 class PlModel(pl.LightningModule):
 

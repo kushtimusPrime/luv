@@ -3,12 +3,9 @@ import numpy as np
 import os.path as osp
 import fcvision.utils.pytorch_utils as ptu
 
-from PIL import Image
 import torch
-from torch.utils.data import Dataset
 import torchvision.transforms.functional as TF
 import random
-
 
 
 def build_dataset(dataset_cfg):
@@ -51,6 +48,8 @@ class FCDataset:
 
     """
     From now now, make sure that dataset_dir has two directories: images and targets.
+    Each contains numpy arrays of the form "image_X.npy" and "target_X.npy", where X
+    is an integer.
     """
 
     def __init__(self, dataset_dir, val, transform):
@@ -59,7 +58,12 @@ class FCDataset:
         self.transform = transform
 
         self.image_fnames = os.listdir(osp.join(self.dataset_dir, "images"))
+        if self.val:
+            self.image_fnames = self.image_fnames[:10]
+        else:
+            self.image_fnames = self.image_fnames[10:]
         self.mask_fnames = [f.replace("image", "target") for f in self.image_fnames]
+
 
 
     def __getitem__(self, idx):

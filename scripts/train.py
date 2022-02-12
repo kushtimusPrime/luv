@@ -6,9 +6,7 @@ from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
-import numpy as np
 
-# from torchvision import models
 import fcvision.utils.run_utils as ru
 from fcvision.utils.arg_utils import parse_yaml
 
@@ -28,7 +26,7 @@ def main():
         np.random.seed(params['seed'])
 
     batch_size = 2
-    loader = DataLoader(params['dataset'], batch_size=batch_size, shuffle=True, num_workers=params['loader_n_workers'])
+    loader = DataLoader(params['dataset'], batch_size=params["batch_size"], shuffle=True, num_workers=params['loader_n_workers'])
     loader_val = DataLoader(params['dataset_val'], batch_size=12, num_workers=params['loader_n_workers'])
 
     trainer = pl.Trainer(
@@ -39,7 +37,6 @@ def main():
         # plugins=pl.plugins.training_type.ddp.DDPPlugin(find_unused_parameters=False),
     )
     trainer.fit(model, loader, loader_val)
-
 
 
 if __name__ == '__main__':
