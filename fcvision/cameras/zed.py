@@ -2,6 +2,8 @@ import pyzed.sl as sl
 import numpy as np
 from autolab_core import CameraIntrinsics
 
+from .camera import Camera
+
 resolutions = {
     "720p": sl.RESOLUTION.HD720,
     "1080p": sl.RESOLUTION.HD1080,
@@ -10,7 +12,7 @@ resolutions = {
 }
 
 
-class ZedImageCapture:
+class ZedImageCapture(Camera):
     def __init__(
         self,
         resolution="2K",

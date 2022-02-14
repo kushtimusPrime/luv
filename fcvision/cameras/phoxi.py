@@ -5,15 +5,17 @@ import fcvision.utils.pytorch_utils as ptu
 import matplotlib.pyplot as plt
 import torch
 
+from .camera import Camera
 
-class Phoxi:
+
+class Phoxi(Camera):
     def __init__(self, *args, **kwargs):
         self.cam = PhoXiSensor("1703005")
         self.cam.start()
         img = self.cam.read()
         self.cam.intrinsics = self.cam.create_intr(img.width, img.height)
 
-    def capture(self):
+    def capture_image(self):
         return self.cam.read()
 
     def net_capture(self):

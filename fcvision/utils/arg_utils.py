@@ -1,14 +1,9 @@
-from argparse import ArgumentParser
 import yaml
 
 from fcvision.learning.dataset import build_dataset
 from fcvision.learning.losses import build_loss
 from fcvision.learning.model import build_PL_model
-
-try:
-    from fcvision.cameras import build_camera
-except:
-    pass # camera libraries not installed
+from fcvision.plugs.plug import build_plug
 
 
 def load_yaml(fname):
@@ -61,4 +56,7 @@ def parse_yaml(fname):
     if "camera" in cfg:
         camera = build_camera(cfg["camera"])
         ret["camera"] = camera
+    if "plug" in cfg:
+        plug = build_plug(cfg["plug"])
+        ret["plug"] = plug
     return cfg, ret
