@@ -1,7 +1,7 @@
 from autolab_core import RigidTransform
 import numpy as np
 from phoxipy.phoxi_sensor import PhoXiSensor
-import fcvision.pytorch_utils as ptu
+import fcvision.utils.pytorch_utils as ptu
 import matplotlib.pyplot as plt
 import torch
 

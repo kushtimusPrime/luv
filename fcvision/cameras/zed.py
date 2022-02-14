@@ -11,36 +11,22 @@ resolutions = {
 
 
 class ZedImageCapture:
-<<<<<<< HEAD:fcvision/zed.py
-    def __init__(self,
-                 resolution='720p',
-                 brightness=-1,
-                 contrast=-1,
-                 hue=-1,
-                 saturation=-1,
-                 sharpness=-1,
-                 gain=10,
-                 exposure=100,
-                 whitebalance_temp=-1,
-                 fps=15):
-=======
     def __init__(
         self,
-        resolution="720p",
+        resolution="2K",
         brightness=-1,
         contrast=-1,
         hue=-1,
         saturation=-1,
         sharpness=-1,
-        gain=-1,
-        exposure=-1,
-        whitebalance_temp=-1,
+        gain=20,
+        exposure=100,
+        whitebalance_temp=3300,fps=15
     ):
 
         # Set sensing mode in FILL
         # runtime_parameters = sl.RuntimeParameters()
         # runtime_parameters.sensing_mode = sl.SENSING_MODE.FILL
->>>>>>> 2680e5d3126995881c64f29ce739a637ff136e08:fcvision/cameras/zed.py
         self.zed = sl.Camera()
 
         assert (
@@ -52,15 +38,9 @@ class ZedImageCapture:
         self.init_params.sdk_verbose = True
         self.init_params.coordinate_units = sl.UNIT.METER
         self.init_params.depth_mode = sl.DEPTH_MODE.ULTRA
-<<<<<<< HEAD:fcvision/zed.py
         self.init_params.depth_stabilization=True
         self.init_params.depth_maximum_distance = 1
         self.init_params.depth_minimum_distance = .1
-=======
-        self.init_params.depth_stabilization = True
-        self.init_params.depth_maximum_distance = 1000
-        self.init_params.depth_minimum_distance = 100
->>>>>>> 2680e5d3126995881c64f29ce739a637ff136e08:fcvision/cameras/zed.py
 
         self.brightness = brightness
         self.contrast = contrast
@@ -74,17 +54,8 @@ class ZedImageCapture:
         # Open the camera
         self.open()
         self.runtime_parameters = sl.RuntimeParameters()
-<<<<<<< HEAD:fcvision/zed.py
 
         zed_calibration_params = self.zed.get_camera_information().calibration_parameters
-=======
-        self.runtime_parameters.confidence_threshold = 100
-        self.runtime_parameters.texture_confidence_threshold = 25
-
-        zed_calibration_params = (
-            self.zed.get_camera_information().calibration_parameters
-        )
->>>>>>> 2680e5d3126995881c64f29ce739a637ff136e08:fcvision/cameras/zed.py
         self.fxl = zed_calibration_params.left_cam.fx
         self.fyl = zed_calibration_params.left_cam.fy
         self.fxr = zed_calibration_params.right_cam.fx
@@ -94,20 +65,7 @@ class ZedImageCapture:
         self.cxr = zed_calibration_params.right_cam.cx
         self.cyr = zed_calibration_params.right_cam.cy
         self.stereo_translation = zed_calibration_params.T
-<<<<<<< HEAD:fcvision/zed.py
         self.intrinsics=CameraIntrinsics('zed',self.fxl,self.fyl,cx=self.cxl,cy=self.cyl)
-=======
-
-    def pixels_to_depth(self, pl, pr, points3d=False):
-        # might need to debug this
-        disparity = pl[:, 0] - pr[:, 0]
-        depth = self.fxl * self.stereo_translation[0] / disparity
-        if points3d:
-            X = pl[:, 0] * depth / self.fxl  # might need to use self.cxl
-            Y = pl[:, 1] * depth / self.fxl
-            return np.stack((X, Y, depth))
-        return depth
->>>>>>> 2680e5d3126995881c64f29ce739a637ff136e08:fcvision/cameras/zed.py
 
     def capture_image(self, depth=False):
         img_left, img_right = sl.Mat(), sl.Mat()
@@ -115,11 +73,7 @@ class ZedImageCapture:
             depth_map = sl.Mat()
             self.runtime_parameters.enable_depth = True
         else:
-<<<<<<< HEAD:fcvision/zed.py
             self.runtime_parameters.enable_depth=False
-=======
-            self.runtime_parameters.enable_depth = False
->>>>>>> 2680e5d3126995881c64f29ce739a637ff136e08:fcvision/cameras/zed.py
 
         if self.zed.grab(self.runtime_parameters) == sl.ERROR_CODE.SUCCESS:
             # A new image is available if grab() returns SUCCESS
@@ -166,16 +120,10 @@ class ZedImageCapture:
             sl.VIDEO_SETTINGS.WHITEBALANCE_TEMPERATURE, self.whitebalance_temp
         )
 
-<<<<<<< HEAD:fcvision/zed.py
     def set_exposure(self,exp):
         self.zed.set_camera_settings(sl.VIDEO_SETTINGS.EXPOSURE,exp)
     def set_gain(self,gain):
         self.zed.set_camera_settings(sl.VIDEO_SETTINGS.GAIN,gain)
-=======
-    def set_exposure(self, exp):
-        self.zed.set_camera_settings(sl.VIDEO_SETTINGS.EXPOSURE, exp)
-
->>>>>>> 2680e5d3126995881c64f29ce739a637ff136e08:fcvision/cameras/zed.py
     def close(self):
         self.zed.close()
 

@@ -7,11 +7,11 @@ import time
 import cv2
 from PIL import Image
 
-from fcvision.phoxi import Phoxi
+from fcvision.cameras.phoxi import Phoxi
 from fcvision.plug import Plug
-from fcvision.zed import ZedImageCapture
-from fcvision.vision_utils import find_center_of_mass
-
+from fcvision.cameras.zed import ZedImageCapture
+from fcvision.utils.vision_utils import find_center_of_mass
+from fcvision.utils.mask_utils import get_rgb, get_segmasks, COMMON_THRESHOLDS
 from untangling.utils.interface_rws import Interface
 from untangling.utils.grasp import GraspSelector
 from untangling.utils.tcps import ABB_WHITE
@@ -21,63 +21,11 @@ N_COLLECT = 1000
 START_ID = 0
 OUTPUT_DIR = "data/cloth_images_auto_test"
 RES='2K'
-UV_EXP=15
-RGB_EXP=25
+UV_EXPS=[5,10,20,40,80]
+RGB_EXP=100
+RGB_GAIN=15
+UV_GAIN=15
 AUTOMATIC=False
-
-colors = {
-    "green": (np.array([40, 50, 100]), np.array([80, 255, 255])),
-    "red": (np.array([0, 50, 150]), np.array([20, 255, 255])),
-    "blue": (np.array([110, 100, 150]), np.array([130, 255, 255])),
-}
-
-
-def get_rgb(zed):
-    iml, imr = zed.capture_image()
-    return iml, imr
-
-
-def get_segmasks(zed, plug, color="blue", plot=True):
-    zed.set_exposure(UV_EXP)
-    plug.turn_on()
-    time.sleep(1)
-    img_left, img_right, img_depth = zed.capture_image(depth=True)
-    plug.turn_off()
-    zed.set_exposure(RGB_EXP)
-    hsv_left = cv2.cvtColor(img_left, cv2.COLOR_RGB2HSV)
-    hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
-
-    lower1, upper1 = colors[color]
-
-    if plot:
-        _, axs = plt.subplots(2, 2)
-        axs[0, 0].imshow(img_left)
-        axs[0, 1].imshow(img_right)
-        axs[1, 0].imshow(hsv_left)
-        axs[1, 1].imshow(hsv_right)
-        plt.show()
-
-    lower_mask = cv2.inRange(hsv_left, lower1, upper1)
-    # upper_mask = cv2.inRange(hsv_left, lower2, upper2)
-    mask_left = lower_mask
-
-    lower_mask = cv2.inRange(hsv_right, lower1, upper1)
-    # upper_mask = cv2.inRange(hsv_right, lower2, upper2)
-    mask_right = lower_mask
-
-    # mask_left = remove_small_blobs(mask_left)
-    # mask_right = remove_small_blobs(mask_right)
-
-    if plot:
-        _, axs = plt.subplots(3, 2)
-        axs[0, 0].imshow(img_left)
-        axs[0, 1].imshow(img_right)
-        axs[1, 0].imshow(hsv_left)
-        axs[1, 1].imshow(hsv_right)
-        axs[2, 0].imshow(mask_left)
-        axs[2, 1].imshow(mask_right)
-        plt.show()
-    return mask_left, mask_right, img_left, img_right, img_depth
 
 
 def l_p(trans, rot=Interface.GRIP_DOWN_R):
@@ -174,11 +122,10 @@ if __name__ == "__main__":
         else:
             input("Enter to take a pic")
         print(f"Taking image {idx}")
-        plug.turn_off()
-        iml, imr = get_rgb(zed)
-        ml, mr, iml_uv, imr_uv, imd = get_segmasks(zed, plug, color="green", plot=True)
+        iml, imr = get_rgb(zed,RGB_EXP,RGB_GAIN)
+        ml, mr, iml_uv, imr_uv, imd = get_segmasks(zed, plug, COMMON_THRESHOLDS['red'],UV_GAIN,UV_EXPS,plot=True)
 
-        print("WARNING, SAVING iMAGES DISABLED")
+        print("WARNING, SAVING IMAGES DISABLED")
         # Image.fromarray(iml_uv).save(osp.join(OUTPUT_DIR, "imagel_uv_%d.png" % idx))
         # Image.fromarray(imr_uv).save(osp.join(OUTPUT_DIR, "imager_uv_%d.png" % idx))
         # Image.fromarray(iml).save(osp.join(OUTPUT_DIR, "imagel_%d.png" % idx))

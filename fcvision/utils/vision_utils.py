@@ -4,9 +4,32 @@ import matplotlib.pyplot as plt
 from skimage.feature import peak_local_max
 from skimage import data, img_as_float
 from scipy import ndimage
+from fcvision.cameras.zed import ZedImageCapture
+import time
 import cv2
-from matplotlib.patches import Circle
 
+
+def get_high_sat_img(imgs):
+    '''
+    given list of np RGB arrays, return an image with the highest saturation pixels
+    '''
+    hsv=cv2.cvtColor(imgs[0],cv2.COLOR_RGB2HSV)
+    for i in range(1,len(imgs)):
+        hsv_new = cv2.cvtColor(imgs[i],cv2.COLOR_RGB2HSV)
+        hsv[hsv_new[:,:,1]>hsv[:,:,1]]=hsv_new[hsv_new[:,:,1]>hsv[:,:,1]]
+    return cv2.cvtColor(hsv,cv2.COLOR_HSV2RGB)
+
+
+def get_multi_exposure_img(zed:ZedImageCapture,exps=[5,10,20,30,40]):
+    imgsl,imgsr=[],[]
+    for exp in exps:
+        zed.set_gain(exp)
+        time.sleep(.2)
+        iml,imr=zed.capture_image(depth=False)
+        imgsr.append(imr)
+        imgsl.append(iml)
+    return imgsl,imgsr
+    
 
 def find_peaks(im):
     return peak_local_max(im, min_distance=20, threshold_abs=0.05)  # 0.1 #0.25 0.7
@@ -116,15 +139,9 @@ def get_shake_point(phoxi_im, vis=False, random=False):
 
 
 if __name__ == "__main__":
-    from fcvision.phoxi import Phoxi
-
-    cam = Phoxi()
-    im = cam.capture()._data
-    pt = get_shake_point(im, vis=True)
-
-    # a = np.zeros([5, 5])
-    # a[0] = 1
-    # a[3, 4] = 1
-    # closest = closest_nonzero_pt(a, [2, 3])
-    # print(closest)
-    # print(a)
+    zed=ZedImageCapture()
+    imgsl,imgsr= get_multi_exposure_img(zed)
+    iml=get_high_sat_img(imgsl)
+    imr=get_high_sat_img(imgsr)
+    plt.imshow(iml)
+    plt.show()
