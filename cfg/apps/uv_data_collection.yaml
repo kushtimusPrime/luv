@@ -1,0 +1,2 @@
+camera: "cfg/cameras/zed.yaml"
+plug: "cfg/plugs/yumi_plug.yaml"
