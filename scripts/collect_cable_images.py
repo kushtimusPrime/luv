@@ -2,12 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import os.path as osp
+from fcvision.utils.arg_utils import parse_yaml
 import time
 import cv2
 from fcvision.utils.mask_utils import get_rgb,get_segmasks,COMMON_THRESHOLDS
 from PIL import Image
 
-from fcvision.plug import Plug
+from fcvision.plugs import Plug
 from fcvision.cameras.zed import ZedImageCapture
 
 N_COLLECT = 100
@@ -23,8 +24,10 @@ RES='2K'
 if __name__ == '__main__':
 	if not osp.exists(OUTPUT_DIR):
 		os.mkdir(OUTPUT_DIR)
-	zed = ZedImageCapture(resolution=RES,exposure=RGB_EXP,gain=RGB_GAIN)
-	plug = Plug()
+	cfg, params = parse_yaml(osp.join("cfg", "apps", "uv_data_collection.yaml"))
+
+	zed = params["camera"]
+	plug = params["plug"]
 	plug.turn_off()
 	idx = START_ID
 	while idx < N_COLLECT:

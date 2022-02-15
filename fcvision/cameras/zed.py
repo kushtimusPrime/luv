@@ -30,7 +30,6 @@ class ZedImageCapture(Camera):
         # runtime_parameters = sl.RuntimeParameters()
         # runtime_parameters.sensing_mode = sl.SENSING_MODE.FILL
         self.zed = sl.Camera()
-
         assert (
             resolution in resolutions
         ), "Choose a valid resolution from (`720p`, `1080p`, `2K`, `VGA`)"

@@ -3,5 +3,5 @@ try:
 except:
 	pass # kasa not installed
 
-def build_plug(cfg);
+def build_plug(cfg):
 	return Plug(cfg["ip"])
