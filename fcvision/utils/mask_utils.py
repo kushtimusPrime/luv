@@ -60,6 +60,7 @@ def get_mask(im, color_bounds, plot=False,smooth=False):
 		axs[1].imshow(hsv)
 		axs[2].imshow(mask)
 		plt.show()
+	mask[mask>0] = 1.0
 	return mask
 
 def get_segmasks(zed, plug, color_bounds, GAIN, EXPS, plot=True):
