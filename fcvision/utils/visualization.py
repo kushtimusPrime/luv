@@ -1,6 +1,6 @@
 import numpy as np
-from fcvision.cameras.zed import ZedImageCapture
 import matplotlib.pyplot as plt
+
 def get_mask_vis(rgb_img,mask,channel=1,strength=2):
     '''
     make a nicely overlaid image of rgb and mask on top
@@ -11,6 +11,8 @@ def get_mask_vis(rgb_img,mask,channel=1,strength=2):
     return rgb_img.astype(original_type)
 
 if __name__=='__main__':
+
+    from fcvision.cameras.zed import ZedImageCapture
     zed = ZedImageCapture()
     iml,_=zed.capture_image()
     mask =np.ones((iml.shape[0],iml.shape[1]))

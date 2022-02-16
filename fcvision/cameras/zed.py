@@ -1,16 +1,22 @@
-import pyzed.sl as sl
+try:
+    import pyzed.sl as sl
+    from autolab_core import CameraIntrinsics
+except:
+    pass
 import numpy as np
-from autolab_core import CameraIntrinsics
 
 from .camera import Camera
 
-resolutions = {
-    "720p": sl.RESOLUTION.HD720,
-    "1080p": sl.RESOLUTION.HD1080,
-    "2K": sl.RESOLUTION.HD2K,
-    "VGA": sl.RESOLUTION.VGA,
-}
 
+try:
+    resolutions = {
+        "720p": sl.RESOLUTION.HD720,
+        "1080p": sl.RESOLUTION.HD1080,
+        "2K": sl.RESOLUTION.HD2K,
+        "VGA": sl.RESOLUTION.VGA,
+    }
+except:
+    pass
 
 class ZedImageCapture(Camera):
     def __init__(

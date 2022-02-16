@@ -56,9 +56,9 @@ def get_mask(im, color_bounds, plot=False,smooth=False):
 		mask = smooth_mask(mask, remove_small_artifacts=True)
 	if plot:
 		_,axs=plt.subplots(3,1)
-		axs[0,0].imshow(im)
-		axs[1,0].imshow(hsv)
-		axs[2,0].imshow(mask)
+		axs[0].imshow(im)
+		axs[1].imshow(hsv)
+		axs[2].imshow(mask)
 		plt.show()
 	return mask
 

@@ -20,7 +20,7 @@ def main():
     os.makedirs(os.path.join(logdir, 'lightning_logs'))
 
     model = params["model"]
-    model.logdir = logdir
+    model.set_logdir(logdir)
 
     if params['seed'] != -1:
         pl.seed_everything(params['seed'])
