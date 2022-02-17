@@ -1,5 +1,5 @@
 dataset:
   name: "FCDataset"
-  dataset_dir: "data/needle_seg"
+  dataset_dir: "data/needle-seg-clutter"
   val: False
   transform: True
