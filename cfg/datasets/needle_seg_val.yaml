@@ -1,0 +1,5 @@
+dataset_val:
+  name: "FCDataset"
+  dataset_dir: "data/needle_seg"
+  val: True
+  transform: True
