@@ -3,17 +3,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from fcvision.cameras.zed import ZedImageCapture
-from fcvision.utils.visualization import get_mask_vis
 import os.path as osp
 import cv2
 from PIL import Image
-from fcvision.utils.vision_utils import get_high_sat_img,get_multi_exposure_img
+from fcvision.utils.vision_utils import get_hdr_capture, get_high_sat_capture, get_high_sat_img,get_multi_exposure_img
 from skimage.morphology import thin
 import time
 
 COMMON_THRESHOLDS = {
 	'green': [(np.array([65, 100, 80]), np.array([100, 255, 255]))],
-	'red': [(np.array([0, 110, 100]), np.array([15, 255, 255])),  (np.array([150, 110, 100]), np.array([180, 255, 255]))],
+	'red': [(np.array([0, 80, 100]), np.array([20, 255, 255])),  
+			(np.array([130, 80, 100]), np.array([180, 255, 255]))],
+	'data/bright_green_towel': [(np.array([0, 50, 100]), np.array([30, 255, 255])),  
+			(np.array([150, 50, 100]), np.array([180, 255, 255]))],
+	'data/white_towel':[(np.array([134, 60, 100]), np.array([150, 255, 255]))],
+	'data/blue_towel':[(np.array([140, 60, 100]), np.array([180, 255, 255]))],
+	'data/green_towel':[(np.array([140, 60, 100]), np.array([180, 255, 255])),(np.array([0, 80, 100]), np.array([20, 255, 255]))],
+	'data/bright_green_towel':[(np.array([140, 60, 100]), np.array([180, 255, 255])),(np.array([0, 80, 100]), np.array([20, 255, 255]))],
+	'data/yellow_towel':[(np.array([140, 60, 100]), np.array([170, 255, 255]))],
+	'data/misc_towels':[(np.array([140, 60, 50]), np.array([180, 255, 255])),(np.array([0, 60, 50]), np.array([20, 255, 255])),(np.array([134, 60, 100]), np.array([150, 255, 255]))],
 	'blue': [(np.array([110, 100, 150]), np.array([130, 255, 255]))]
 }
 
@@ -62,22 +70,17 @@ def get_mask(im, color_bounds, plot=False,smooth=False):
 		plt.show()
 	return mask
 
-def get_segmasks(zed, plug, color_bounds, GAIN, EXPS, plot=True):
+def get_segmasks(zed, plug, color_bounds, GAIN, EXPS, plot=True,capture_fn=get_hdr_capture):
 	zed.set_gain(GAIN)
-	print("Comment the plug lines back in")
-	# plug.turn_on()
-	# img_left, img_right = zed.capture_image(depth=True)
-	imgsl,imgsr=get_multi_exposure_img(zed,EXPS)
-	img_left=get_high_sat_img(imgsl)
-	img_right=get_high_sat_img(imgsr)
-	# plug.turn_off()
+	plug.turn_on()
+	img_left,img_right=capture_fn(zed,EXPS)
+	plug.turn_off()
 	hsv_left = cv2.cvtColor(img_left,cv2.COLOR_RGB2HSV)
 	hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
-	mask_left=get_mask(hsv_left,color_bounds,smooth=False)
-	mask_right=get_mask(hsv_right,color_bounds,smooth=False)
+	mask_left=get_mask(img_left,color_bounds,smooth=False)
+	mask_right=get_mask(img_right,color_bounds,smooth=False)
 	if plot:
-		print("???")
-		fig,axs=plt.subplots(3,2)
+		_,axs=plt.subplots(3,2)
 		axs[0,0].imshow(img_left)
 		axs[0,1].imshow(img_right)
 		axs[1,0].imshow(hsv_left)
@@ -91,6 +94,6 @@ def get_segmasks(zed, plug, color_bounds, GAIN, EXPS, plot=True):
 def get_rgb(zed:ZedImageCapture,EXP,GAIN):
 	zed.set_exposure(EXP)
 	zed.set_gain(GAIN)
-	time.sleep(.25)
+	time.sleep(.7)
 	iml,imr=zed.capture_image()
 	return iml,imr
