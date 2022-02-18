@@ -79,7 +79,8 @@ class FCDataset:
         else:
             im = np.load(osp.join(self.dataset_dir, "images", im_file))
             target = np.load(osp.join(self.dataset_dir, "targets", target_file))
-            self.cache[idx] = im, target
+            if self.cache:
+                self.cache[idx] = im, target
 
         im = np.transpose(im, (2, 0, 1))
         if im.max() > 1.0:
