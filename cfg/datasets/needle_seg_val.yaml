@@ -3,3 +3,4 @@ dataset_val:
   dataset_dir: "data/needle-seg-clutter"
   val: True
   transform: True
+  cache: True

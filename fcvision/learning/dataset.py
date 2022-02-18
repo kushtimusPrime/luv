@@ -12,7 +12,8 @@ def build_dataset(dataset_cfg):
     dataset_dir = dataset_cfg["dataset_dir"]
     dataset_val = dataset_cfg["val"]
     transform = dataset_cfg["transform"]
-    dataset = FCDataset(dataset_dir=dataset_dir, val=dataset_val, transform=transform)
+    cache = dataset_cfg["cache"] if "cache" in dataset_cfg else False
+    dataset = FCDataset(dataset_dir=dataset_dir, val=dataset_val, transform=transform, cache=cache)
     return dataset
 
 
@@ -51,10 +52,14 @@ class FCDataset:
     is an integer.
     """
 
-    def __init__(self, dataset_dir, val, transform):
+    def __init__(self, dataset_dir, val, transform, cache=False):
         self.dataset_dir = dataset_dir
         self.val = val
         self.transform = transform
+        if cache:
+            self.cache = {}
+        else:
+            self.cache = None
 
         self.image_fnames = os.listdir(osp.join(self.dataset_dir, "images"))
         if self.val:
@@ -67,8 +72,13 @@ class FCDataset:
         im_file = self.image_fnames[idx]
         target_file = self.mask_fnames[idx]
 
-        im = np.load(osp.join(self.dataset_dir, "images", im_file))
-        target = np.load(osp.join(self.dataset_dir, "targets", target_file))
+        if idx in self.cache:
+            im, target = self.cache[idx]
+        else:
+            im = np.load(osp.join(self.dataset_dir, "images", im_file))
+            target = np.load(osp.join(self.dataset_dir, "targets", target_file))
+            self.cache[idx] = im, target
+
 
         im = np.transpose(im, (2, 0, 1))
         if im.max() > 1.0:
