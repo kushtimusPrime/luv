@@ -31,13 +31,11 @@ def main():
         batch_size=params["batch_size"],
         shuffle=True,
         num_workers=params["loader_n_workers"],
-        persistent_workers=True,
     )
     loader_val = DataLoader(
         params["dataset_val"],
         batch_size=12,
         num_workers=params["loader_n_workers"],
-        persistent_workers=True,
     )
 
     trainer = pl.Trainer(
