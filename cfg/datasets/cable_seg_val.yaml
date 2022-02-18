@@ -3,4 +3,4 @@ dataset_val:
   dataset_dir: "data/cable_seg"
   val: True
   transform: True
-  cache: True
+  cache: False

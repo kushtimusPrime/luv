@@ -4,7 +4,6 @@ import os.path as osp
 
 from torch.utils.data import DataLoader
 import torch.cuda
-import torch.nn as nn
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
@@ -26,6 +25,7 @@ def main():
         pl.seed_everything(params["seed"])
         np.random.seed(params["seed"])
 
+
     loader = DataLoader(
         params["dataset"],
         batch_size=params["batch_size"],
@@ -40,7 +40,8 @@ def main():
 
     trainer = pl.Trainer(
         default_root_dir=logdir,
-        gpus=params["n_gpus"],  # doesn't seem to be necessary with DataParallel...
+        gpus=params["n_gpus"],
+        strategy="ddp",
         max_epochs=params["epochs"],
         callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, "models"))],
         auto_lr_find=True,
