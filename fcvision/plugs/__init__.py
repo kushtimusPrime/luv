@@ -1,7 +1,8 @@
 try:
-	from .plug import Plug
+    from .plug import Plug
 except:
-	pass # kasa not installed
+    pass  # kasa not installed
+
 
 def build_plug(cfg):
-	return Plug(cfg["ip"])
+    return Plug(cfg["ip"])
