@@ -169,6 +169,6 @@ if __name__ == "__main__":
 	# imgsl,imgsr= get_multi_exposure_img(zed)
 	# iml=get_high_sat_img(imgsl)
 	# imr=get_high_sat_img(imgsr)
-	hdrl,hdrr = get_hdr_capture(zed)
+	hdrl,hdrr = get_hdr_capture(zed,list(range(100,0,-20)))
 	plt.imshow(hdrl)
 	plt.show()

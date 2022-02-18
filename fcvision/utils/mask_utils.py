@@ -14,13 +14,11 @@ COMMON_THRESHOLDS = {
 	'green': [(np.array([65, 100, 80]), np.array([100, 255, 255]))],
 	'red': [(np.array([0, 80, 100]), np.array([20, 255, 255])),  
 			(np.array([130, 80, 100]), np.array([180, 255, 255]))],
-	'data/bright_green_towel': [(np.array([0, 50, 100]), np.array([30, 255, 255])),  
-			(np.array([150, 50, 100]), np.array([180, 255, 255]))],
-	'data/white_towel':[(np.array([134, 60, 100]), np.array([150, 255, 255]))],
+	'data/white_towel':[(np.array([134, 20, 100]), np.array([150, 255, 255]))],
 	'data/blue_towel':[(np.array([140, 60, 100]), np.array([180, 255, 255]))],
 	'data/green_towel':[(np.array([140, 60, 100]), np.array([180, 255, 255])),(np.array([0, 80, 100]), np.array([20, 255, 255]))],
 	'data/bright_green_towel':[(np.array([140, 60, 100]), np.array([180, 255, 255])),(np.array([0, 80, 100]), np.array([20, 255, 255]))],
-	'data/yellow_towel':[(np.array([140, 60, 100]), np.array([170, 255, 255]))],
+	'data/yellow_towel':[(np.array([140, 20, 100]), np.array([170, 255, 255]))],
 	'data/misc_towels':[(np.array([140, 60, 50]), np.array([180, 255, 255])),(np.array([0, 60, 50]), np.array([20, 255, 255])),(np.array([134, 60, 100]), np.array([150, 255, 255]))],
 	'blue': [(np.array([110, 100, 150]), np.array([130, 255, 255]))]
 }

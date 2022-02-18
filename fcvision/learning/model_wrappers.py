@@ -4,14 +4,18 @@ import matplotlib.pyplot as plt
 from abc import ABCMeta, abstractmethod
 
 from fcvision.utils.vision_utils import find_peaks
+import fcvision.utils.pytorch_utils as ptu
 
 
 def build_model_wrapper(cfg, model):
-    wrapper_class = globals()[cfg["wrapper_class"]]
+    wrapper_class = globals()[cfg["wrapper"]]
+    return wrapper_class(model)
 
 
 def prepare_image(img):
     im = np.copy(img)
+    if im.max() > 1:
+        im = im / 255
     im = np.transpose(im, (2, 0, 1))
     im = ptu.torchify(im, device="cuda")
     im = torch.unsqueeze(im, 0)

@@ -42,13 +42,13 @@ def create_masks():
 		mask = get_mask(uv_im, COMMON_THRESHOLDS[DATA_DIR], plot=False,smooth=True)
 		save_file=f"{DATA_DIR}/{mask_name}"
 		vis=get_mask_vis(uv_im,mask,channel=2,strength=10)
-		_,axs=plt.subplots(1,2)
-		axs[0].imshow(vis)
-		axs[1].imshow(mask)
-		plt.show()
-		print("WARNING NOT SAVING, UNCOMMENT LINES BELOW")
-		# print(f"saving {save_file}")
-		# Image.fromarray(mask).save(save_file)
+		# _,axs=plt.subplots(1,2)
+		# axs[0].imshow(vis)
+		# axs[1].imshow(mask)
+		# plt.show()
+		# print("WARNING NOT SAVING, UNCOMMENT LINES BELOW")
+		print(f"saving {save_file}")
+		Image.fromarray(mask).save(save_file)
 
 if __name__=='__main__':
 	create_masks()

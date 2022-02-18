@@ -33,7 +33,7 @@ if __name__ == '__main__':
 		plt.imshow(iml);plt.show()
 		ml, mr, iml_uv, imr_uv = get_segmasks(zed, plug, COMMON_THRESHOLDS['red'],UV_GAIN,UV_EXPS,plot=False)
 		zed.set_exposure(RGB_EXP)
-		zed.set_exposure(RGB_GAIN)
+		zed.set_gain(RGB_GAIN)
 		Image.fromarray(iml_uv).save(osp.join(OUTPUT_DIR, "imagel_uv_%d.png"%idx))
 		Image.fromarray(imr_uv).save(osp.join(OUTPUT_DIR, "imager_uv_%d.png"%idx))
 		Image.fromarray(iml).save(osp.join(OUTPUT_DIR, "imagel_%d.png"%idx))
