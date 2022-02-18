@@ -32,9 +32,12 @@ def main():
 
     trainer = pl.Trainer(
         default_root_dir=logdir,
-        gpus=params['n_gpus'],
+        gpus=params['n_gpus'], # doesn't seem to be necessary with DataParallel...
         max_epochs=params['epochs'],
-        callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, 'models'))],auto_lr_find=True
+        callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, 'models'))],
+        auto_lr_find=True,
+        precision=16,
+        amp_backend="native"
     )
     torch.cuda.empty_cache()
     trainer.fit(model, loader, loader_val)
