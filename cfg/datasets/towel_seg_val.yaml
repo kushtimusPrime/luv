@@ -1,4 +1,4 @@
-dataset:
+dataset_val:
   name: "FCDataset"
   dataset_dir: "data/towel_seg"
   val: True

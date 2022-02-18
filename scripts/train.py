@@ -4,6 +4,7 @@ import os.path as osp
 
 from torch.utils.data import DataLoader
 import torch.cuda
+import torch.nn as nn
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
