@@ -30,3 +30,5 @@ for i, (imfile, targfile) in enumerate(zip(images, targets)):
 	np.save(osp.join(OUTPUT_DIR, "images", "image_%d.npy"%i), im)
 	np.save(osp.join(OUTPUT_DIR, "targets", "target_%d.npy"%i), targ)
 
+
+
