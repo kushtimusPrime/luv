@@ -3,3 +3,4 @@ dataset:
   dataset_dir: "data/towel_seg"
   val: False
   transform: True
+  cache: True
