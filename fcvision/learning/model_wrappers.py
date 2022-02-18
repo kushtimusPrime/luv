@@ -23,7 +23,6 @@ def prepare_image(img):
 
 
 class ModelWrapper(metaclass=ABCMeta):
-
     @abstractmethod
     def __call__(self, img):
         pass

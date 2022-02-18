@@ -39,7 +39,6 @@ class PlModel(pl.LightningModule):
         self.params = params
         self.set_logdir(logdir)
 
-
         self.model = fcn_resnet50(
             pretrained=False, progress=False, num_classes=params["num_classes"]
         )

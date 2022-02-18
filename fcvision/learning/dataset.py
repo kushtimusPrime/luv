@@ -13,7 +13,9 @@ def build_dataset(dataset_cfg):
     dataset_val = dataset_cfg["val"]
     transform = dataset_cfg["transform"]
     cache = dataset_cfg["cache"] if "cache" in dataset_cfg else False
-    dataset = FCDataset(dataset_dir=dataset_dir, val=dataset_val, transform=transform, cache=cache)
+    dataset = FCDataset(
+        dataset_dir=dataset_dir, val=dataset_val, transform=transform, cache=cache
+    )
     return dataset
 
 
@@ -72,19 +74,18 @@ class FCDataset:
         im_file = self.image_fnames[idx]
         target_file = self.mask_fnames[idx]
 
-        if idx in self.cache:
+        if self.cache and idx in self.cache:
             im, target = self.cache[idx]
         else:
             im = np.load(osp.join(self.dataset_dir, "images", im_file))
             target = np.load(osp.join(self.dataset_dir, "targets", target_file))
             self.cache[idx] = im, target
 
-
         im = np.transpose(im, (2, 0, 1))
         if im.max() > 1.0:
-            im = im/255.
+            im = im / 255.0
         if target.max() > 1.0:
-            target = target/255.
+            target = target / 255.0
 
         if len(target.shape) == 2:
             target = target[np.newaxis, :, :]
