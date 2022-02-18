@@ -71,6 +71,10 @@ class FCDataset:
         target = np.load(osp.join(self.dataset_dir, "targets", target_file))
 
         im = np.transpose(im, (2, 0, 1))
+        if im.max() > 1.0:
+            im = im/255.
+        if target.max() > 1.0:
+            target = target/255.
 
         if len(target.shape) == 2:
             target = target[np.newaxis, :, :]

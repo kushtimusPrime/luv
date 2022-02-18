@@ -6,10 +6,11 @@ import numpy as np
 
 from fcvision.utils.arg_utils import parse_yaml
 
-cfg, ret = parse_yaml(osp.join("cfg", "config.yaml"))
+cfg, ret = parse_yaml(osp.join("cfg", "datasets", "cable_seg.yaml"))
 dataset = ret["dataset"]
 
 im, target = dataset[0]
+print(im)
 plt.imshow(np.transpose(im, (1, 2, 0))); plt.show()
 plt.imshow(target[0]); plt.show()
 
