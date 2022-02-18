@@ -22,14 +22,14 @@ def get_rgb(zed):
 def main():
 	params = parse_args()
 	logdir = ru.get_file_prefix(params)
-	os.makedirs(os.path.join(logdir, 'lightning_logs'))
+	os.makedirs(os.path.join(logdir, 'vis'))
 	model = SegNetwork(params['checkpoint'], params=params, logdir=logdir)
-	zed = ZedImageCapture(resolution='1080p')
+	zed = params['camera']
 
 	for idx in range(10):
 		iml, imr = get_rgb(zed)
-		predl = model(iml)
-		predr = model(imr)
+		predl = model(iml, prep=True)
+		predr = model(imr, prep=True)
 
 
 		_,axs=plt.subplots(2,2)
