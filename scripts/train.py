@@ -41,7 +41,7 @@ def main():
     trainer = pl.Trainer(
         default_root_dir=logdir,
         gpus=params["n_gpus"],
-        strategy="ddp",
+        # strategy="ddp",
         max_epochs=params["epochs"],
         callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, "models"))],
         auto_lr_find=True,
