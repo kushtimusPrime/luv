@@ -15,20 +15,19 @@ from untangling.utils.grasp import GraspSelector
 from yumiplanning.yumi_kinematics import YuMiKinematics as YK
 from fcvision.utils.async_writer import AsyncWrite
 
-N_COLLECT = 222
-START_ID = 170
-OUTPUT_DIR = "data/white_towel"
-#done: green,yellow, blue
-COLOR_BOUNDS=COMMON_THRESHOLDS[OUTPUT_DIR]
+N_COLLECT = 10
+START_ID = 0
+OUTPUT_DIR = "data/tshirt"
+COLOR_BOUNDS=COMMON_THRESHOLDS.get(OUTPUT_DIR,COMMON_THRESHOLDS['red'])
 RES='2K'
 UV_EXPS={'data/white_towel':[7],
 		'data/blue_towel':[15],'data/yellow_towel':[20],'data/green_towel':[20],'data/bright_green_towel':[9],
-		'data/misc_towels':[20,15,10,5]}[OUTPUT_DIR]
+		'data/misc_towels':[20,15,10,5],'data/tshirt':[100,90,80]}.get(OUTPUT_DIR,[20])
 RGB_EXP=100
 RGB_GAIN=20
 UV_GAIN=20
-AUTOMATIC=True
-cap_fn = get_high_sat_capture
+AUTOMATIC=False
+cap_fn = get_hdr_capture
 
 
 def l_p(trans, rot=Interface.GRIP_DOWN_R):

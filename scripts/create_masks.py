@@ -11,7 +11,7 @@ from PIL import Image
 from skimage.morphology import thin
 
 import glob
-DATA_DIR = 'data/white_towel'
+DATA_DIR = 'data/green_towel'
 # DATA_DIR = 'data/cable_painted_red_images'
 # colors = {
 # 	'green': [(np.array([80, 100, 80]), np.array([110, 255, 220]))],
