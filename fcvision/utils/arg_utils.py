@@ -1,3 +1,4 @@
+import torch
 import yaml
 
 from fcvision.learning.dataset import build_dataset
@@ -41,7 +42,9 @@ def parse_yaml(fname):
         ret["model"] = pl_model
         ret["seed"] = cfg["train"]["seed"]
         ret["loader_n_workers"] = cfg["train"]["loader_n_workers"]
-        ret["n_gpus"] = cfg["train"]["n_gpus"]
+        # ret["n_gpus"] = cfg["train"]["n_gpus"]
+        available_gpus = [torch.cuda.device(i) for i in range(torch.cuda.device_count())]
+        ret["n_gpus"] = len(available_gpus)
         ret["epochs"] = cfg["train"]["epochs"]
         ret["batch_size"] = cfg["train"]["batch_size"]
     if "experiment" in cfg:

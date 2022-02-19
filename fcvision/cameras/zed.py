@@ -18,6 +18,7 @@ try:
 except:
     pass
 
+
 class ZedImageCapture(Camera):
     def __init__(
         self,
@@ -29,7 +30,8 @@ class ZedImageCapture(Camera):
         sharpness=-1,
         gain=20,
         exposure=100,
-        whitebalance_temp=3300,fps=15
+        whitebalance_temp=3300,
+        fps=15,
     ):
 
         # Set sensing mode in FILL
@@ -45,9 +47,9 @@ class ZedImageCapture(Camera):
         self.init_params.sdk_verbose = True
         self.init_params.coordinate_units = sl.UNIT.METER
         self.init_params.depth_mode = sl.DEPTH_MODE.ULTRA
-        self.init_params.depth_stabilization=True
+        self.init_params.depth_stabilization = True
         self.init_params.depth_maximum_distance = 1
-        self.init_params.depth_minimum_distance = .1
+        self.init_params.depth_minimum_distance = 0.1
 
         self.brightness = brightness
         self.contrast = contrast
@@ -62,7 +64,9 @@ class ZedImageCapture(Camera):
         self.open()
         self.runtime_parameters = sl.RuntimeParameters()
 
-        zed_calibration_params = self.zed.get_camera_information().calibration_parameters
+        zed_calibration_params = (
+            self.zed.get_camera_information().calibration_parameters
+        )
         self.fxl = zed_calibration_params.left_cam.fx
         self.fyl = zed_calibration_params.left_cam.fy
         self.fxr = zed_calibration_params.right_cam.fx
@@ -72,7 +76,9 @@ class ZedImageCapture(Camera):
         self.cxr = zed_calibration_params.right_cam.cx
         self.cyr = zed_calibration_params.right_cam.cy
         self.stereo_translation = zed_calibration_params.T
-        self.intrinsics=CameraIntrinsics('zed',self.fxl,self.fyl,cx=self.cxl,cy=self.cyl)
+        self.intrinsics = CameraIntrinsics(
+            "zed", self.fxl, self.fyl, cx=self.cxl, cy=self.cyl
+        )
 
     def capture_image(self, depth=False):
         img_left, img_right = sl.Mat(), sl.Mat()
@@ -80,7 +86,7 @@ class ZedImageCapture(Camera):
             depth_map = sl.Mat()
             self.runtime_parameters.enable_depth = True
         else:
-            self.runtime_parameters.enable_depth=False
+            self.runtime_parameters.enable_depth = False
 
         if self.zed.grab(self.runtime_parameters) == sl.ERROR_CODE.SUCCESS:
             # A new image is available if grab() returns SUCCESS
@@ -127,10 +133,12 @@ class ZedImageCapture(Camera):
             sl.VIDEO_SETTINGS.WHITEBALANCE_TEMPERATURE, self.whitebalance_temp
         )
 
-    def set_exposure(self,exp):
-        self.zed.set_camera_settings(sl.VIDEO_SETTINGS.EXPOSURE,exp)
-    def set_gain(self,gain):
-        self.zed.set_camera_settings(sl.VIDEO_SETTINGS.GAIN,gain)
+    def set_exposure(self, exp):
+        self.zed.set_camera_settings(sl.VIDEO_SETTINGS.EXPOSURE, exp)
+
+    def set_gain(self, gain):
+        self.zed.set_camera_settings(sl.VIDEO_SETTINGS.GAIN, gain)
+
     def close(self):
         self.zed.close()
 

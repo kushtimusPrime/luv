@@ -11,8 +11,10 @@ dataset = ret["dataset"]
 
 im, target = dataset[0]
 print(im)
-plt.imshow(np.transpose(im, (1, 2, 0))); plt.show()
-plt.imshow(target[0]); plt.show()
+plt.imshow(np.transpose(im, (1, 2, 0)))
+plt.show()
+plt.imshow(target[0])
+plt.show()
 
 
 # idx = 0
@@ -28,4 +30,3 @@ plt.imshow(target[0]); plt.show()
 # 	np.save(osp.join("data/cable_seg", "targets", "target_%d.npy"%idx), mask)
 
 # 	idx += 1
-
