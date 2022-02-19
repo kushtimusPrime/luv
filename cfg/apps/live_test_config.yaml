@@ -1,8 +1,9 @@
 test:
   num_classes: 1
   seed: -1
-  #  checkpoint: "outputs/cable_segmentation_2022-02-16/18-03-47/models/epoch=199-step=50799.ckpt"
-  checkpoint: "models/towelNet.ckpt"
+  checkpoint: "models/cableNet.ckpt"
+  # checkpoint: "models/towelNet.ckpt"
+  # checkpoint: "models/needleNet.ckpt"
   wrapper: "SegNetwork"
 experiment: "cable_segmentation_test"
 camera: "cfg/cameras/zed.yaml"
