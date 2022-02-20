@@ -43,6 +43,9 @@ def target_transforms(image, target):
     image = TF.adjust_brightness(image, np.random.uniform(0.5, 1.5))
     image = TF.adjust_contrast(image, np.random.uniform(0.85, 1.15))
 
+    if random.random() > 0.8:
+        image = TF.rgb_to_grayscale(image, 3)
+
     return image, target
 
 
