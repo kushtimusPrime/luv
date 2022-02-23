@@ -71,6 +71,7 @@ class PlModel(pl.LightningModule):
         self.log(
             "Loss", loss_sm, on_step=True, on_epoch=True, prog_bar=True, logger=True
         )
+        self.log("train/loss", loss_sm)
         return loss_sm
 
     def validation_step(self, batch, batch_idx):
@@ -97,6 +98,7 @@ class PlModel(pl.LightningModule):
             save_image(
                 pred + im, os.path.join(self.vis_dir, "%d_%d_overlayed.png" % (idx, j))
             )
+            self.logger.log_image(key=f"val_{j}", images=[im, pred, pred + im], caption=["Input", "Pred", "Overlayed"])
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(
