@@ -1,6 +1,8 @@
-dataset_val: "cfg/datasets/cable_seg_val.yaml"
+dataset_val: "cfg/datasets/towel_seg_val.yaml"
 test:
   num_classes: 1
   seed: -1
-  checkpoint: "outputs/cable_segmentation_2022-02-16/08-27-11/models/model.ckpt"
-experiment: "cable_segmentation_test"
+  # checkpoint: "outputs/needle_segmentation_2022-02-19/03-39-09/models/epoch=199-step=34199.ckpt"
+  # checkpoint: "outputs/cable_segmentation_2022-02-16/08-27-11/models/model.ckpt"
+  checkpoint: "outputs/towel_segmentation_2022-02-20/20-42-54/models/epoch=199-step=44199.ckpt"
+experiment: "towel_segmentation_test"

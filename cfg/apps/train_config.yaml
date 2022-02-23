@@ -1,5 +1,5 @@
-dataset: "cfg/datasets/towel_seg.yaml"
-dataset_val: "cfg/datasets/towel_seg_val.yaml"
+dataset: "cfg/datasets/cable_seg.yaml"
+dataset_val: "cfg/datasets/cable_seg_val.yaml"
 train:
   loss:
     name: "SegmentationLoss"
@@ -10,5 +10,5 @@ train:
   loader_n_workers: 12
   n_gpus: 1
   epochs: 200
-  batch_size: 4
-experiment: "towel_segmentation"
+  batch_size: 8
+experiment: "cable_segmentation"
