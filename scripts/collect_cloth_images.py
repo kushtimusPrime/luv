@@ -15,25 +15,19 @@ from untangling.utils.grasp import GraspSelector
 from yumiplanning.yumi_kinematics import YuMiKinematics as YK
 from fcvision.utils.async_writer import AsyncWrite
 
-N_COLLECT = 222
-START_ID = 170
-OUTPUT_DIR = "data/white_towel"
-# done: green,yellow, blue
-COLOR_BOUNDS = COMMON_THRESHOLDS[OUTPUT_DIR]
-RES = "2K"
-UV_EXPS = {
-    "data/white_towel": [7],
-    "data/blue_towel": [15],
-    "data/yellow_towel": [20],
-    "data/green_towel": [20],
-    "data/bright_green_towel": [9],
-    "data/misc_towels": [20, 15, 10, 5],
-}[OUTPUT_DIR]
-RGB_EXP = 100
-RGB_GAIN = 20
-UV_GAIN = 20
-AUTOMATIC = True
-cap_fn = get_high_sat_capture
+N_COLLECT = 500
+START_ID = 325
+OUTPUT_DIR = "data/yellow_towel"
+COLOR_BOUNDS=COMMON_THRESHOLDS.get(OUTPUT_DIR,COMMON_THRESHOLDS['red'])
+RES='2K'
+UV_EXPS={'data/white_towel':[7],
+		'data/blue_towel':[15],'data/yellow_towel':[20],'data/green_towel':[20],'data/bright_green_towel':[9],
+		'data/misc_towels':[20,15,10,5],'data/tshirt':[100,90,80]}.get(OUTPUT_DIR,[20])
+RGB_EXP=100
+RGB_GAIN=20
+UV_GAIN=20
+AUTOMATIC=True
+cap_fn = get_hdr_capture
 
 
 def l_p(trans, rot=Interface.GRIP_DOWN_R):
@@ -155,7 +149,7 @@ if __name__ == "__main__":
         print(f"Taking image {idx}")
         iml, imr = get_rgb(zed, RGB_EXP, RGB_GAIN)
         ml, mr, iml_uv, imr_uv = get_segmasks(
-            zed, plug, COLOR_BOUNDS, UV_GAIN, UV_EXPS, plot=True, capture_fn=cap_fn
+            zed, plug, COLOR_BOUNDS, UV_GAIN, UV_EXPS, plot=False, capture_fn=cap_fn
         )
         zed.set_exposure(RGB_EXP)
         zed.set_exposure(RGB_GAIN)

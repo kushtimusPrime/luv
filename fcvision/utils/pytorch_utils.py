@@ -43,3 +43,23 @@ def to_numpy(x):
     if x is None:
         return x
     return x.detach().cpu().numpy()
+
+
+def process_checkpoint(ckpt):
+    """
+    Required because models trained using DataParallel will have "module" in the checkpoint.
+    """
+    # original saved file with DataParallel
+    # old_dict = torch.load('models/towelNet.ckpt')
+    old_dict = torch.load(ckpt)
+    state_dict = old_dict['state_dict']
+    # create new OrderedDict that does not contain `module.`
+    from collections import OrderedDict
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        name = k.replace("module.", "")
+        print(name, k)
+        new_state_dict[name] = v
+    old_dict['state_dict'] = new_state_dict
+    return old_dict
+

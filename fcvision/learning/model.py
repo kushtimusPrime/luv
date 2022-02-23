@@ -24,6 +24,7 @@ def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
         }
         return PlModel(params)
     else:
+        assert checkpoint is not None
         params = {
             "loss": None,
             "num_classes": cfg["num_classes"],

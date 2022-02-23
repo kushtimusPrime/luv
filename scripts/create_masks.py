@@ -11,8 +11,7 @@ from PIL import Image
 from skimage.morphology import thin
 
 import glob
-
-DATA_DIR = "data/white_towel"
+DATA_DIR = 'data/yellow_towel'
 # DATA_DIR = 'data/cable_painted_red_images'
 # colors = {
 # 	'green': [(np.array([80, 100, 80]), np.array([110, 255, 220]))],
@@ -46,7 +45,7 @@ def create_masks():
         # mask = np.maximum(get_mask(uv_im,color='green',plot=False), get_mask(uv_im, color='red', plot=False))
         mask = get_mask(uv_im, COMMON_THRESHOLDS[DATA_DIR], plot=False, smooth=True)
         save_file = f"{DATA_DIR}/{mask_name}"
-        vis = get_mask_vis(uv_im, mask, channel=2, strength=10)
+        # vis = get_mask_vis(uv_im, mask, channel=2, strength=10)
         # _,axs=plt.subplots(1,2)
         # axs[0].imshow(vis)
         # axs[1].imshow(mask)
