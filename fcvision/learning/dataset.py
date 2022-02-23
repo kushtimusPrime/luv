@@ -82,6 +82,14 @@ class FCDataset:
         else:
             im = np.load(osp.join(self.dataset_dir, "images", im_file))
             target = np.load(osp.join(self.dataset_dir, "targets", target_file))
+            if ".npz" in im_file:
+                im_data = im["arr_0"]
+                im.close()
+                im = im_data
+            if ".npz" in target_file:
+                target_data = target["arr_0"]
+                target.close()
+                target = target_data
             if self.cache:
                 self.cache[idx] = im, target
 
