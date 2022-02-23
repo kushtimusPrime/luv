@@ -1,8 +1,8 @@
 test:
   num_classes: 1
   seed: -1
-  checkpoint: "models/cableNet.ckpt"
-  # checkpoint: "models/towelNet.ckpt"
+  # checkpoint: "models/cableNet.ckpt"
+  checkpoint: "models/towelNet.ckpt"
   # checkpoint: "models/needleNet.ckpt"
   wrapper: "SegNetwork"
 experiment: "cable_segmentation_test"

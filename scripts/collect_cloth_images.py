@@ -15,9 +15,9 @@ from untangling.utils.grasp import GraspSelector
 from yumiplanning.yumi_kinematics import YuMiKinematics as YK
 from fcvision.utils.async_writer import AsyncWrite
 
-N_COLLECT = 10
-START_ID = 0
-OUTPUT_DIR = "data/tshirt"
+N_COLLECT = 500
+START_ID = 325
+OUTPUT_DIR = "data/yellow_towel"
 COLOR_BOUNDS=COMMON_THRESHOLDS.get(OUTPUT_DIR,COMMON_THRESHOLDS['red'])
 RES='2K'
 UV_EXPS={'data/white_towel':[7],
@@ -26,7 +26,7 @@ UV_EXPS={'data/white_towel':[7],
 RGB_EXP=100
 RGB_GAIN=20
 UV_GAIN=20
-AUTOMATIC=False
+AUTOMATIC=True
 cap_fn = get_hdr_capture
 
 
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         print(f"Taking image {idx}")
         iml, imr = get_rgb(zed, RGB_EXP, RGB_GAIN)
         ml, mr, iml_uv, imr_uv = get_segmasks(
-            zed, plug, COLOR_BOUNDS, UV_GAIN, UV_EXPS, plot=True, capture_fn=cap_fn
+            zed, plug, COLOR_BOUNDS, UV_GAIN, UV_EXPS, plot=False, capture_fn=cap_fn
         )
         zed.set_exposure(RGB_EXP)
         zed.set_exposure(RGB_GAIN)

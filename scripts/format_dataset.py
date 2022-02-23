@@ -4,9 +4,10 @@ import imageio
 import numpy as np
 import pathlib
 
-dataset_directories = ["data/white_towel", "data/blue_towel", "data/green_towel", "data/yellow_towel"]
+# dataset_directories = ["data/white_towel", "data/blue_towel", "data/green_towel", "data/yellow_towel"]
+dataset_directories = ["data/white_towel"]
 
-OUTPUT_DIR = "data/towel_seg"
+OUTPUT_DIR = "data/white_towel_seg"
 
 pathlib.Path(f"{OUTPUT_DIR}/images").mkdir(parents=True, exist_ok=True)
 pathlib.Path(f"{OUTPUT_DIR}/targets").mkdir(parents=True, exist_ok=True)
