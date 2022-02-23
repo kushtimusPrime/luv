@@ -6,7 +6,9 @@ from torch.utils.data import DataLoader
 import torch.cuda
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.loggers import WandbLogger
 import matplotlib.pyplot as plt
+
 
 import fcvision.utils.run_utils as ru
 from fcvision.utils.arg_utils import parse_yaml
@@ -38,10 +40,15 @@ def main():
         num_workers=params["loader_n_workers"],
     )
 
+
+
+    wandb_logger = WandbLogger(project="all-you-need-is-luv", entity="luv", name=params["experiment"])
+
     trainer = pl.Trainer(
         default_root_dir=logdir,
         gpus=params["n_gpus"],
-        strategy="ddp",
+        logger=wandb_logger,
+        # strategy="ddp",
         max_epochs=params["epochs"],
         callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, "models"))],
         auto_lr_find=True,
