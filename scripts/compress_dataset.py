@@ -13,4 +13,4 @@ def compress_image(fn):
 if __name__ == '__main__':
 	images = [osp.join(DATASET_DIR, "images", f) for f in os.listdir(osp.join(DATASET_DIR, "images"))]
 	targets = [osp.join(DATASET_DIR, "targets", f) for f in os.listdir(osp.join(DATASET_DIR, "targets"))]
-	pqdm(images, compress_image, n_jobs=12)
+	pqdm(images + targets, compress_image, n_jobs=12)
