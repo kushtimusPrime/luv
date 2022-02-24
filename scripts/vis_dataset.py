@@ -6,17 +6,17 @@ import numpy as np
 
 from fcvision.utils.arg_utils import parse_yaml
 
-cfg, ret = parse_yaml(osp.join("cfg", "datasets", "towel_seg.yaml"))
-dataset = ret["dataset"]
+cfg, ret = parse_yaml(osp.join("cfg", "datasets", "towel_seg_val.yaml"))
+dataset = ret["dataset_val"]
 
-im, target = dataset[0]
+im = dataset[0]
 
 import IPython; IPython.embed()
 print(im)
 plt.imshow(np.transpose(im, (1, 2, 0)))
 plt.show()
-plt.imshow(target[0])
-plt.show()
+# plt.imshow(target[0])
+# plt.show()
 
 
 # idx = 0

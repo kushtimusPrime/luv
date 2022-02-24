@@ -11,11 +11,12 @@ import matplotlib.pyplot as plt
 
 
 import fcvision.utils.run_utils as ru
-from fcvision.utils.arg_utils import parse_yaml
+from fcvision.utils.arg_utils import load_yaml_recursive, parse_yaml,load_yaml
 
 
 def main():
-    cfg, params = parse_yaml(osp.join("cfg", "apps", "train_config.yaml"))
+    yaml_path=osp.join("cfg", "apps", "train_config.yaml")
+    cfg, params = parse_yaml(yaml_path)
 
     logdir = ru.get_file_prefix(params)
     os.makedirs(os.path.join(logdir, "lightning_logs"))
@@ -40,9 +41,9 @@ def main():
         num_workers=params["loader_n_workers"],
     )
 
-
-
-    wandb_logger = WandbLogger(project="all-you-need-is-luv", entity="luv", name=params["experiment"])
+    yaml = load_yaml(yaml_path)
+    wandb_config = load_yaml_recursive(yaml)
+    wandb_logger = WandbLogger(project="all-you-need-is-luv", entity="luv", name=params["experiment"],config=wandb_config)
 
     trainer = pl.Trainer(
         default_root_dir=logdir,

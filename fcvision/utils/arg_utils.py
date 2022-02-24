@@ -28,7 +28,6 @@ def parse_yaml(fname):
     ret = {}
     cfg = load_yaml(fname)
     cfg = load_yaml_recursive(cfg)
-
     if "dataset" in cfg:
         dataset = build_dataset(cfg["dataset"])
         ret["dataset"] = dataset

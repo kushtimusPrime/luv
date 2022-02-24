@@ -6,6 +6,7 @@ import fcvision.utils.pytorch_utils as ptu
 import torch
 import torchvision.transforms.functional as TF
 import random
+import cv2
 
 
 def build_dataset(dataset_cfg):
@@ -75,35 +76,50 @@ class FCDataset:
 
     def __getitem__(self, idx):
         im_file = self.image_fnames[idx]
-        target_file = self.mask_fnames[idx]
+        if not self.val:
+            target_file = self.mask_fnames[idx]
 
         if self.cache and idx in self.cache:
-            im, target = self.cache[idx]
+            if not self.val:
+                im, target = self.cache[idx]
+            else:
+                im = self.cache[idx]
         else:
             im = np.load(osp.join(self.dataset_dir, "images", im_file))
-            target = np.load(osp.join(self.dataset_dir, "targets", target_file))
             if ".npz" in im_file:
                 im_data = im["arr_0"]
                 im.close()
                 im = im_data
-            if ".npz" in target_file:
-                target_data = target["arr_0"]
-                target.close()
-                target = target_data
+            if not self.val:
+                target = np.load(osp.join(self.dataset_dir, "targets", target_file))
+                if ".npz" in target_file:
+                    target_data = target["arr_0"]
+                    target.close()
+                    target = target_data
             if self.cache:
-                self.cache[idx] = im, target
+                if not self.val:
+                    self.cache[idx] = im, target
+                else:
+                    self.cache[idx] = im
+
+        #DELETE THESE TWO LINES BELOW
+        im=cv2.resize(im,(640,480))
+        if not self.val:
+            target=cv2.resize(target,(640,480))
 
         im = np.transpose(im, (2, 0, 1))
         if im.max() > 1.0:
             im = im / 255.0
-        if target.max() > 1.0:
+        if not self.val and target.max() > 1.0:
             target = target / 255.0
-
-        if len(target.shape) == 2:
+        if not self.val and len(target.shape) == 2:
             target = target[np.newaxis, :, :]
 
         if self.transform:
-            im, target = target_transforms(im, target)
+            if self.val:
+                im = target_transforms(im)
+            else:
+                im, target = target_transforms(im, target)
 
         if self.val:
             return ptu.torchify(im)

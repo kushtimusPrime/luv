@@ -24,7 +24,6 @@ def main():
         with torch.no_grad():
             pred = torch.sigmoid(model(im))[0, 0].cpu().numpy()
         im = np.transpose(im.cpu().numpy()[0], (1, 2, 0))
-        import IPython; IPython.embed(); assert 0
         overlayed = np.copy(im)
         overlayed[pred > 0.25] = [1, 0, 0]
         im = Image.fromarray((im*255).astype(np.uint8))

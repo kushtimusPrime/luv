@@ -13,6 +13,7 @@ from torchvision.models.segmentation import fcn_resnet50
 from torchvision.utils import save_image
 
 from fcvision.learning.losses import *
+from fcvision.learning.unet_model import UNet
 
 
 def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
@@ -21,29 +22,35 @@ def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
             "num_classes": cfg["num_classes"],
             "loss": loss,
             "optim_learning_rate": cfg["optimizer"]["optim_learning_rate"],
+            "weight_decay":cfg['optimizer']['weight_decay'],"decay_gamma":cfg['optimizer']['decay_gamma']
         }
-        return PlModel(params)
+        return PlModel(params,backbone=cfg['backbone'])
     else:
         assert checkpoint is not None
         params = {
             "loss": None,
-            "num_classes": cfg["num_classes"],
+            "num_classes": cfg["num_classes"]
         }
         return PlModel.load_from_checkpoint(checkpoint, params=params).eval().cuda()
 
 
 class PlModel(pl.LightningModule):
-    def __init__(self, params, logdir=None):
+    def __init__(self, params, logdir=None, backbone = 'FCN50'):
+        '''
+        backbone can be "UNET" or "FCN50"
+        '''
         super().__init__()
 
         self.save_hyperparameters()
         self.params = params
         self.set_logdir(logdir)
-
-        self.model = fcn_resnet50(
-            pretrained=False, progress=False, num_classes=params["num_classes"]
-        )
-        self.model = nn.DataParallel(self.model)
+        if backbone=='FCN50':
+            self.model = fcn_resnet50(
+                pretrained=False, progress=False, num_classes=params["num_classes"]
+            )
+        elif backbone=='UNET':
+            self.model = UNet(3,params['num_classes'])
+        # self.model = nn.DataParallel(self.model)
         self.loss_fn = params["loss"]
 
     def set_logdir(self, logdir):
@@ -86,7 +93,7 @@ class PlModel(pl.LightningModule):
 
         idx = self.vis_counter
         self.vis_counter += 1
-        if idx % 10 or not len(outputs):
+        if idx % 1 or not len(outputs):
             return
         outputs = outputs[0]
         for j in range(len(outputs["ims"])):
@@ -103,6 +110,7 @@ class PlModel(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(
-            self.parameters(), lr=self.params["optim_learning_rate"]
+            self.parameters(), lr=self.params["optim_learning_rate"],weight_decay=self.params['weight_decay']
         )
-        return optimizer
+        scheduler=torch.optim.lr_scheduler.ExponentialLR(optimizer,gamma = self.params['decay_gamma'])
+        return [optimizer],[scheduler]
