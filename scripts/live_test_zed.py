@@ -10,7 +10,7 @@ import os.path as osp
 import numpy as np
 import time
 from fcvision.utils.mask_utils import get_rgb, get_segmasks, COMMON_THRESHOLDS
-
+import cv2
 
 """
 python scripts/live_test_zed.py --checkpoint outputs/2021-12-09/07-53-38/models/epoch\=199-step\=7599.ckpt
@@ -18,13 +18,6 @@ python scripts/live_test_zed.py --checkpoint outputs/2021-12-09/07-53-38/models/
 
 RGB_EXP = 100
 RGB_GAIN = 20
-
-# def get_rgb(zed):
-# 	zed.set_exposure(18)
-# 	time.sleep(.5)
-# 	iml,imr=zed.capture_image()
-# 	return iml,imr
-
 
 def main():
     cfg, params = parse_yaml(osp.join("cfg", "apps", "live_test_config.yaml"))
@@ -34,9 +27,11 @@ def main():
     zed = params["camera"]
     model = params["model"]
 
-    for idx in range(10):
+    for idx in range(100):
         # iml, imr = get_rgb(zed)
         iml, imr = get_rgb(zed, RGB_EXP, RGB_GAIN)
+        iml=cv2.resize(iml,(1280,720))
+        imr=cv2.resize(imr,(1280,720))
 
         predl = model(iml, prep=True)
         predr = model(imr, prep=True)

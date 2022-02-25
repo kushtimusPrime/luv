@@ -54,7 +54,7 @@ def main():
         callbacks=[ModelCheckpoint(dirpath=os.path.join(logdir, "models"))],
         auto_lr_find=True,
         precision=16,
-        amp_backend="native",
+        amp_backend="native"
     )
     torch.cuda.empty_cache()
     trainer.fit(model, loader, loader_val)

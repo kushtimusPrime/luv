@@ -8,6 +8,7 @@ models
 __pycache__
 PhotoneoLogFiles
 venv
+wandb
 
 *.pyc
 *.egg-info

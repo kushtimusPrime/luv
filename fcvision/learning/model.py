@@ -15,6 +15,18 @@ from torchvision.utils import save_image
 from fcvision.learning.losses import *
 from fcvision.learning.unet_model import UNet
 
+def process_checkpoint(ckpt):
+    # original saved file with DataParallel
+    old_dict = torch.load(ckpt)
+    state_dict = old_dict['state_dict']
+    # create new OrderedDict that does not contain `module.`
+    from collections import OrderedDict
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        name = k.replace("module.", "")
+        new_state_dict[name] = v
+    old_dict['state_dict'] = new_state_dict
+    return old_dict
 
 def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
     if train:
@@ -22,20 +34,21 @@ def build_PL_model(cfg, train=False, loss=None, checkpoint=None):
             "num_classes": cfg["num_classes"],
             "loss": loss,
             "optim_learning_rate": cfg["optimizer"]["optim_learning_rate"],
-            "weight_decay":cfg['optimizer']['weight_decay'],"decay_gamma":cfg['optimizer']['decay_gamma']
+            "weight_decay":cfg['optimizer']['weight_decay'],"decay_gamma":cfg['optimizer']['decay_gamma'],
+            'backbone':cfg['backbone']
         }
-        return PlModel(params,backbone=cfg['backbone'])
+        return PlModel(params)
     else:
         assert checkpoint is not None
         params = {
-            "loss": None,
+                "loss": None,'backbone':cfg['backbone'],
             "num_classes": cfg["num_classes"]
         }
         return PlModel.load_from_checkpoint(checkpoint, params=params).eval().cuda()
 
 
 class PlModel(pl.LightningModule):
-    def __init__(self, params, logdir=None, backbone = 'FCN50'):
+    def __init__(self, params, logdir=None):
         '''
         backbone can be "UNET" or "FCN50"
         '''
@@ -44,11 +57,11 @@ class PlModel(pl.LightningModule):
         self.save_hyperparameters()
         self.params = params
         self.set_logdir(logdir)
-        if backbone=='FCN50':
+        if params['backbone']=='FCN50':
             self.model = fcn_resnet50(
                 pretrained=False, progress=False, num_classes=params["num_classes"]
             )
-        elif backbone=='UNET':
+        elif params['backbone']=='UNET':
             self.model = UNet(3,params['num_classes'])
         # self.model = nn.DataParallel(self.model)
         self.loss_fn = params["loss"]
