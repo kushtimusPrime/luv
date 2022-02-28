@@ -1,3 +1,4 @@
+from turtle import width
 from autolab_core import RigidTransform,CameraIntrinsics
 import numpy as np
 from yumirws.yumi import YuMi
@@ -19,18 +20,20 @@ from untangling.utils.tcps import ABB_WHITE
 from yumiplanning.yumi_kinematics import YuMiKinematics as YK
 
 from scripts.collect_cable_images import N_COLLECT
-OUTPUT_DIR='data/live_execution_folding'
+from PIL import Image
+
+OUTPUT_DIR='data/live_execution_folding/tier1'
 RGB_EXP=100
 RGB_GAIN=20
 UV_EXPS=[20,15,10,5]
 UV_GAIN=20
 COLOR_BOUNDS=COMMON_THRESHOLDS['data/white_towel']
 NETWORK_ACTIONS = True
-SAVE_IMGS=False
-area_thres = 400
-Y_thre = 230
+SAVE_IMGS=True
+area_thres = 100
+Y_thre = 0
 
-START_ID=0
+START_ID=1
 N_COLLECT=100
 T_world_zed = RigidTransform.load('/home/justin/yumi/phoxipy/tools/zed_to_world_bww.tf')
 
@@ -71,35 +74,55 @@ def grasp_point(p3d,center_list,iface):
         H = RigidTransform(rotation =RigidTransform.x_axis_rotation(np.pi), translation=corner_robot.translation,from_frame= frame[2*i], to_frame=frame[2*i+1])
 
         grasp = Grasp(H)
+        grasp.gripper_pos=.005
         grasp.pose.translation[2]=.04
         grasp_list.append(grasp)
     return grasp_list
 
-def grasp_point_filter(p3d,center_list,iface):
+def grasp_point_filter(p3d,center_list,mask_list,ml,iface):
     p3d_center_list = []
+    gripper_dist=.008
     for i,center in enumerate(center_list):
         center_x,center_y = center
-        Tcam_p = RigidTransform(translation=p3d[center_y,center_x],from_frame="corner",to_frame="zed")
-        p3d_center = (T_world_zed*Tcam_p).translation
-        if p3d_center[0] < 0.52 and p3d_center[1]<0.3:
-            p3d_center[-1] = 0.04 if p3d_center[-1]<0.05 else p3d_center[-1]
-            p3d_center_list.append(p3d_center)
+        left,top,width,height = mask_list[i]
 
+        rec = np.zeros_like(ml, dtype=bool)
+        rec[top:top+height,left:left+width] = True
+
+        true_mask = np.logical_and(rec,ml).astype(bool)
+        mask = p3d.data[true_mask[..., None].repeat(3, axis=2)].reshape(-1,3)
+        
+        Tcam_p = RigidTransform(translation=np.median(mask, axis=0), from_frame="corner", to_frame="zed")
+        p3d_center = (T_world_zed*Tcam_p).translation
+        if p3d_center[0] < 0.6 and p3d_center[2]<0.1:
+            # p3d_center[-1] = 0.04 
+            # if p3d_center[-1]<0.08 or p3d_center[-1]>0.08 else p3d_center[-1]
+            p3d_center_list.append(p3d_center)
+    print(p3d_center_list)
     frame = [iface.L_TCP.from_frame,iface.L_TCP.to_frame,iface.R_TCP.from_frame,iface.R_TCP.to_frame]
     grasp_list = []
 
     if len(p3d_center_list)>=2:
         min_dist = 1000000
         p3d_center_list = np.array(p3d_center_list)
+        min_pair = []
         for i in range(len(p3d_center_list)-1):
             dist_list = p3d_center_list[i+1:]-p3d_center_list[i]
             dist_list_2 = [c[0]**2+c[1]**2 for c in dist_list]
             if np.min(dist_list_2)< min_dist:
-                min_dist = np.min(dist_list_2)
-                if p3d_center_list[i][1] < p3d_center_list[np.argmin(dist_list_2)+i+1][1]:
-                    min_pair = [p3d_center_list[np.argmin(dist_list_2)+i+1].tolist(),p3d_center_list[i].tolist()]
-                else:
-                    min_pair = [p3d_center_list[i].tolist(),p3d_center_list[np.argmin(dist_list_2)+i+1].tolist()]
+                dist_list_2 = sorted(dist_list_2)
+                dist_list_ind = np.argsort(dist_list_2)
+                for j,dist in enumerate(dist_list_2):
+                    if dist < min_dist and dist>0.01:
+                        min_dist = dist
+                        if p3d_center_list[i][1] < p3d_center_list[dist_list_ind[j]+i+1][1]:
+                            min_pair = [p3d_center_list[dist_list_ind[j]+i+1].tolist(),p3d_center_list[i].tolist()]
+                        else:
+                            min_pair = [p3d_center_list[i].tolist(),p3d_center_list[dist_list_ind[j]+i+1].tolist()]
+                    break
+        print(min_pair)
+        if len(min_pair) < 2:
+            min_pair = [p3d_center_list[0].tolist()]
         print(min_pair)
         # import pdb;pdb.set_trace()
         for i,p3d_point in enumerate(min_pair):
@@ -107,12 +130,17 @@ def grasp_point_filter(p3d,center_list,iface):
             # corner_robot = T_world_zed*Tcam_p
             H = RigidTransform(rotation =RigidTransform.x_axis_rotation(np.pi), translation=p3d_point,from_frame= frame[2*i], to_frame=frame[2*i+1])
             grasp = Grasp(H)
+            grasp.gripper_pos=gripper_dist
             grasp_list.append(grasp)
-    else:
+    elif len(p3d_center_list)==1:
         print("grasp one after filtering")
         H = RigidTransform(rotation =RigidTransform.x_axis_rotation(np.pi), translation=p3d_center_list[0],from_frame= frame[0], to_frame=frame[1])
         grasp = Grasp(H)
+        grasp.gripper_pos=gripper_dist
         grasp_list.append(grasp)
+    else:
+        return []
+
 
     return grasp_list
 
@@ -179,7 +207,7 @@ def reset_cloth(iface: Interface):
 			iface.sync()
 	iface.sync()
 	iface.go_delta_single("right", [0, 0, 0.05], reltool=False)
-	dx, dy = np.random.uniform((-0.1, -0.1), (0.1, 0.1))
+	dx, dy = 0,0
 	iface.go_pose_plan_single("right", r_p([0.4 + dx, 0 + dy, 0.4]))
 	iface.sync()
 	iface.shake_J('right',[1],2)
@@ -202,6 +230,7 @@ def grasp_corner(ml,iface,zed):
     sort_index = np.argsort(area_list)[::-1]
     #the first is the entire one, use the second one
     center_list = []
+    mask_list = []
     area_list = area_list[sort_index]
     for i,area in enumerate(area_list):
         if i ==0:
@@ -210,6 +239,7 @@ def grasp_corner(ml,iface,zed):
             center_x,center_y = int(centroids[sort_index[i]][0]),int(centroids[sort_index[i]][1])
             if center_y > Y_thre:
                 center_list.append([center_x,center_y])
+                mask_list.append(stats[sort_index[i]][:4])
         else:
             break
 
@@ -231,7 +261,7 @@ def grasp_corner(ml,iface,zed):
         yumi_grasp_one(iface,grasp_list[0])
     else:
         print("Grasping 2")
-        grasp_list = grasp_point_filter(p3d,center_list,iface)
+        grasp_list = grasp_point_filter(p3d,center_list,mask_list,ml,iface)
         # min_dist = 1000000
         # center_list = np.array(center_list)
         # for i in range(len(center_list)-1):
@@ -248,14 +278,18 @@ def grasp_corner(ml,iface,zed):
         # import pdb;pdb.set_trace()
         if len(grasp_list) >1:
             yumi_grasp_two(iface,grasp_list)
-        else:
+        elif len(grasp_list)==1:
             yumi_grasp_one(iface,grasp_list[0])
+        else:
+            reset_cloth(iface)
 
 
 
 def yumi_grasp_one(iface:Interface,grasp):
     arm = 'left'
     iface.grasp(l_grasp=grasp)
+    iface.sync()
+    iface.go_delta_single(arm,[0,0,.05])
     iface.sync()
     up_pose = l_p([.4,-.2,0.35])
     down_pose = l_p([.4,0.1,0.06])
@@ -273,29 +307,35 @@ def yumi_grasp_one(iface:Interface,grasp):
     iface.sync()
 
 def yumi_grasp_two(iface:Interface,grasp):
-    grasp[0].pose.rotation=RigidTransform.x_axis_rotation(-np.pi/5)@grasp[0].pose.rotation
-    grasp[1].pose.rotation=RigidTransform.x_axis_rotation(np.pi/5)@grasp[1].pose.rotation
+    inwards_transform_H=RigidTransform(translation=[0,0,.01])
+    grasp[0].pose.rotation=RigidTransform.x_axis_rotation(-np.pi/7)@grasp[0].pose.rotation
+    grasp[1].pose.rotation=RigidTransform.x_axis_rotation(np.pi/7)@grasp[1].pose.rotation
+    for g in grasp:
+        g.pose=g.pose*inwards_transform_H.as_frames(g.pose.from_frame,g.pose.from_frame)
     iface.grasp(l_grasp=grasp[0],r_grasp=grasp[1])
     iface.sync()
+    iface.set_speed((.2,np.pi))
     hold_dist=.2
     forward_dist=.2
-    hold_height=.35
-    up_pose_l = l_p([.35,hold_dist/2,hold_height])
-    up_pose_r = r_p([.35,-hold_dist/2,hold_height])
-    forward_pose_l = l_p([.35+forward_dist,hold_dist/2,hold_height])
-    forward_pose_r = r_p([.35+forward_dist,-hold_dist/2,hold_height])
-    down_pose_l = l_p([.35+forward_dist,hold_dist/2,.12])
-    down_pose_r = r_p([.35+forward_dist,-hold_dist/2,.12])
-    back_pose_l = l_p([.35,hold_dist/2,.07])
-    back_pose_r = r_p([.35,-hold_dist/2,.07])
+    hold_height=.4
+    up_pose_l = l_p([.35,hold_dist/3,hold_height])
+    up_pose_r = r_p([.35,-hold_dist/3,hold_height])
+    forward_pose_l = l_p([.3+forward_dist,hold_dist/2,hold_height])
+    forward_pose_r = r_p([.3+forward_dist,-hold_dist/2,hold_height])
+    down_pose_l = l_p([.35+forward_dist,hold_dist/2,.2])
+    down_pose_r = r_p([.35+forward_dist,-hold_dist/2,.2])
+    back_pose_l = l_p([.3,hold_dist/2,.07])
+    back_pose_r = r_p([.3,-hold_dist/2,.07])
     iface.go_pose_plan(up_pose_l,up_pose_r,table_z=.02,mode='Distance')
+    iface.sync()
+    iface.set_speed(iface.default_speed)
     l_ps=[forward_pose_l,down_pose_l,back_pose_l]
     r_ps=[forward_pose_r,down_pose_r,back_pose_r]
     iface.go_cartesian(l_targets=l_ps,r_targets=r_ps)
+    time.sleep(.1)
     iface.sync()
     iface.open_gripper('left')
     iface.open_gripper('right')
-    time.sleep(.2)
     iface.home()
     iface.sync()
 
@@ -323,12 +363,13 @@ if __name__ == "__main__":
             axs[1].imshow(ml)
             ml=(ml>.8).astype(np.uint8)
             axs[2].imshow(ml)
+            plt.savefig(osp.join(OUTPUT_DIR, "imagel_mask_%d.png" % idx))
             plt.show()
         else:
             ml, mr, iml_uv, imr_uv = get_segmasks(zed, plug, COLOR_BOUNDS,UV_GAIN,UV_EXPS,plot=False)
         if SAVE_IMGS:
-            writer = AsyncWrite(iml,imr,iml_uv,imr_uv,idx,OUTPUT_DIR)
-            writer.start()
+            # writer = AsyncWrite(iml,imr,iml_uv,imr_uv,idx,OUTPUT_DIR)
+            Image.fromarray(iml).save(osp.join(OUTPUT_DIR, "imagel_%d.png" % idx))
         idx += 1
             
         grasp_list = grasp_corner(ml,iface,zed)
