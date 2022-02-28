@@ -11,10 +11,14 @@ import tqdm
 # OUTPUT_DIR = "data/towel_seg"
 
 
-dataset_directories = ["data/unlabeled_test_blue_towel", "data/unlabeled_test_green_towel", "data/unlabeled_test_towels", "data/unlabeled_test_white_towel", "data/unlabeled_test_yellow_towel"]
+# dataset_directories = ["data/unlabeled_test_blue_towel", "data/unlabeled_test_green_towel", "data/unlabeled_test_towels", "data/unlabeled_test_white_towel", "data/unlabeled_test_yellow_towel"]
 # dataset_directories = ["data/white_towel"]
 
-OUTPUT_DIR = "data/towel_seg_test"
+# OUTPUT_DIR = "data/towel_seg_test"
+
+
+dataset_directories = ["data/cable_unpainted_test_images"]
+OUTPUT_DIR = "data/cable_seg_test"
 
 
 def format_training_dataset(dataset_directories, output_dir):
