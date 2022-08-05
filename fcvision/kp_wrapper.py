@@ -23,7 +23,6 @@ from fcvision.tasks import get_task_parameters
 import fcvision.pytorch_utils as ptu
 import time
 
-
 class KeypointNetwork:
 
     def __init__(self, checkpoint, params=None, logdir=None):

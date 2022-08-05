@@ -9,7 +9,7 @@ from matplotlib.patches import Circle
 
 
 def find_peaks(im):
-	return peak_local_max(im, min_distance=20, threshold_abs=0.05) #0.1 #0.25 0.7
+	return peak_local_max(im, min_distance=20, threshold_abs=0.02) #0.05 #0.1 #0.25 0.7
 
 
 def find_center_of_mass(im):
@@ -73,7 +73,7 @@ def get_highest_depth_pt_within_radius(depth_img, nominal_pt, radius=20, depth_m
 
 	return pt
 
-def get_shake_point(phoxi_im, vis=False, random=False):
+def get_shake_point(phoxi_im, vis=False, random=False, add_vec=None):
 	"""
 	Takes in a [h, w, 4] dimension image from the phoxi and outputs
 	a point on the cable mask with depth information closest to the
@@ -87,6 +87,8 @@ def get_shake_point(phoxi_im, vis=False, random=False):
 
 	depth_mask = phoxi_im[:,:,3] > 0
 	com = find_center_of_mass(color_mask) if not random else np.random.choice(np.concatenate(np.nonzero(color_mask), axis=-1))
+	if add_vec is not None:
+		com += add_vec
 	valid_depth_mask = get_valid_depth_mask(color_mask, depth_mask)
 	# plt.imshow(valid_depth_mask); plt.show()
 	closest = closest_nonzero_pt(valid_depth_mask, com)
