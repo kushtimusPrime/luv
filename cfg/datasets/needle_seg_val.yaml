@@ -1,0 +1,6 @@
+dataset_val:
+  name: "FCDataset"
+  dataset_dir: "data/needle-seg-clutter"
+  val: True
+  transform: True
+  cache: False

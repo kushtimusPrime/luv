@@ -1,0 +1,6 @@
+dataset:
+  name: "FCDataset"
+  dataset_dir: "data/towel_seg"
+  val: False
+  transform: True
+  cache: False

@@ -1,0 +1,13 @@
+test:
+  num_classes: 1
+  seed: -1
+  #checkpoint: "models/cableNet.ckpt"
+  checkpoint: "models/towelUnet.ckpt"
+  # checkpoint: "models/towelNet.ckpt"
+  # checkpoint: "test.ckpt"
+  # checkpoint: "models/needleNet.ckpt"
+  wrapper: "SegNetwork"
+  backbone: "UNET"
+experiment: "cable_segmentation_test"
+camera: "cfg/cameras/zed.yaml"
+plug: "cfg/plugs/yumi_plug.yaml"

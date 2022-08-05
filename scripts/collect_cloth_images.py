@@ -1,84 +1,33 @@
+from attr import asdict
 from autolab_core import RigidTransform
 import numpy as np
 import matplotlib.pyplot as plt
+from yumirws.yumi import YuMi
 import os
 import os.path as osp
-import time
 import cv2
-from PIL import Image
 
-from fcvision.phoxi import Phoxi
-from fcvision.plug import Plug
-from fcvision.zed import ZedImageCapture
-from fcvision.vision_utils import find_center_of_mass
-
+from fcvision.utils.arg_utils import parse_yaml
+from fcvision.utils.vision_utils import get_hdr_capture, get_high_sat_capture
+from fcvision.utils.mask_utils import get_rgb, get_segmasks, COMMON_THRESHOLDS
 from untangling.utils.interface_rws import Interface
 from untangling.utils.grasp import GraspSelector
-from untangling.utils.tcps import ABB_WHITE
 from yumiplanning.yumi_kinematics import YuMiKinematics as YK
+from fcvision.utils.async_writer import AsyncWrite
 
-N_COLLECT = 1000
-START_ID = 0
-OUTPUT_DIR = "data/cloth_images_auto_dec16justin"
-
-colors = {
-    "green": (np.array([40, 50, 100]), np.array([80, 255, 255])),
-    "red": (np.array([0, 50, 150]), np.array([20, 255, 255])),
-    "blue": (np.array([110, 100, 150]), np.array([130, 255, 255])),
-}
-
-
-def get_rgb(zed):
-    zed.set_exposure(80)
-    time.sleep(1)
-    iml, imr = zed.capture_image()
-    return iml, imr
-
-
-def get_segmasks(zed, plug, color="blue", plot=True):
-
-    zed.set_exposure(30)
-    plug.turn_on()
-    time.sleep(1)
-    img_left, img_right, img_depth = zed.capture_image(depth=True)
-    plug.turn_off()
-    img_left = img_left[:, :, ::-1]
-    img_right = img_right[:, :, ::-1]
-    # plt.imshow(img_left[:,:,::-1]); plt.show(); assert 0
-    hsv_left = cv2.cvtColor(img_left, cv2.COLOR_RGB2HSV)
-    hsv_right = cv2.cvtColor(img_right, cv2.COLOR_RGB2HSV)
-
-    lower1, upper1 = colors[color]
-
-    if plot:
-        _, axs = plt.subplots(2, 2)
-        axs[0, 0].imshow(img_left)
-        axs[0, 1].imshow(img_right)
-        axs[1, 0].imshow(hsv_left)
-        axs[1, 1].imshow(hsv_right)
-        plt.show()
-
-    lower_mask = cv2.inRange(hsv_left, lower1, upper1)
-    # upper_mask = cv2.inRange(hsv_left, lower2, upper2)
-    mask_left = lower_mask
-
-    lower_mask = cv2.inRange(hsv_right, lower1, upper1)
-    # upper_mask = cv2.inRange(hsv_right, lower2, upper2)
-    mask_right = lower_mask
-
-    # mask_left = remove_small_blobs(mask_left)
-    # mask_right = remove_small_blobs(mask_right)
-
-    if plot:
-        _, axs = plt.subplots(3, 2)
-        axs[0, 0].imshow(img_left)
-        axs[0, 1].imshow(img_right)
-        axs[1, 0].imshow(hsv_left)
-        axs[1, 1].imshow(hsv_right)
-        axs[2, 0].imshow(mask_left)
-        axs[2, 1].imshow(mask_right)
-        plt.show()
-    return mask_left, mask_right, img_left, img_right, img_depth
+N_COLLECT = 500
+START_ID = 325
+OUTPUT_DIR = "data/yellow_towel"
+COLOR_BOUNDS=COMMON_THRESHOLDS.get(OUTPUT_DIR,COMMON_THRESHOLDS['red'])
+RES='2K'
+UV_EXPS={'data/white_towel':[7],
+		'data/blue_towel':[15],'data/yellow_towel':[20],'data/green_towel':[20],'data/bright_green_towel':[9],
+		'data/misc_towels':[20,15,10,5],'data/tshirt':[100,90,80]}.get(OUTPUT_DIR,[20])
+RGB_EXP=100
+RGB_GAIN=20
+UV_GAIN=20
+AUTOMATIC=True
+cap_fn = get_hdr_capture
 
 
 def l_p(trans, rot=Interface.GRIP_DOWN_R):
@@ -116,9 +65,9 @@ def sample_cloth_point(cloth_seg):
     for i in range(0, nb_components):
         if sizes[i] >= min_size:
             cloth_seg[output == i + 1] = 255
-    # sometimes choose a point only along the edge
+    # choose a point only along the edge
     for i in range(5):
-        #remove some from border for safer grasps
+        # remove some from border for safer grasps
         eroded = cv2.erode(cloth_seg, np.ones((3, 3)))
         cloth_seg &= eroded
     eroded = cv2.erode(cloth_seg, np.ones((3, 3)))
@@ -131,66 +80,80 @@ def sample_cloth_point(cloth_seg):
 
 
 def reset_cloth(iface: Interface):
-    # TODO: dragging move, probability of grabbing corner
     # input("Press enter when ready to take a new image.")
     img = iface.take_image()
     colorim = img.color._data[:, :, 0]
     h, w = colorim.shape
     g = GraspSelector(img, iface.cam.intrinsics, iface.T_PHOXI_BASE)
     cloth_seg = colorim
-    cloth_seg[cloth_seg < 60] = 0
-    crop_r = 0.1
-    # cloth_seg[: int(crop_r * h), :] = 0
-    cloth_seg[:, : int(crop_r * w)] = 0
-    cloth_seg[int((1 - 2 * crop_r) * h) :, :] = 0
-    cloth_seg[:, int((1 - crop_r) * w) :] = 0
+    cloth_seg[cloth_seg < 130] = 0
+    # zeros out the border to remove robot
+    crop_lr = 0.1
+    crop_bottom = 0.2
+    crop_top = 0.2
+    cloth_seg[:, : int(crop_lr * w)] = 0
+    cloth_seg[:, int((1 - crop_lr) * w) :] = 0
+    cloth_seg[int((1 - crop_bottom) * h) :, :] = 0
+    cloth_seg[: int(crop_top * h), :] = 0
     cloth_seg[cloth_seg != 0] = 255
-    coords = sample_cloth_point(cloth_seg)
-    # com = find_center_of_mass(cloth_seg)
-    # coords = (int(com[1]), int(com[0]))
-    grasp = g.top_down_grasp(coords, 0.02, iface.R_TCP)
-    grasp.pose.translation[2] = 0.035
-    grasp.speed = (0.3, np.pi)
-    iface.grasp(r_grasp=grasp)
+    while True:
+        coords = sample_cloth_point(cloth_seg)
+        grasp = g.top_down_grasp(coords, 0.02, iface.R_TCP)
+        grasp.pose.translation[2] = 0.04
+        grasp.speed = (1, 2 * np.pi)
+        try:
+            iface.grasp(r_grasp=grasp)
+            break
+        except:
+            iface.y = YuMi(l_tcp=iface.L_TCP, r_tcp=iface.R_TCP)
+            iface.open_grippers()
+            iface.home()
+            iface.sync()
+    iface.sync()
     iface.go_delta_single("right", [0, 0, 0.05], reltool=False)
     dx, dy = np.random.uniform((-0.1, -0.1), (0.1, 0.1))
-    iface.go_pose("left", l_p([0.4 + dx, 0 + dy, 0.3]), linear=False)
+    iface.go_pose_plan_single("right", r_p([0.4 + dx, 0 + dy, 0.4]))
     iface.sync()
-    iface.shake_right_J([1], 3)
+    iface.shake_J("right", [1], 2)
     iface.open_gripper("right")
     iface.home()
     iface.sync()
 
 
 if __name__ == "__main__":
-
     if not osp.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
-    zed = ZedImageCapture()
-    plug = Plug()
-    iface = Interface(speed=(0.6, 4 * np.pi))
-    iface.open_grippers()
-    iface.home()
-    iface.sync()
+    cfg, params = parse_yaml(osp.join("cfg", "apps", "uv_data_collection.yaml"))
+
+    zed = params["camera"]
+    plug = params["plug"]
+    plug.turn_off()
+    if AUTOMATIC:
+        iface = Interface(speed=(1.5, 6 * np.pi))
+        iface.open_grippers()
+        iface.home()
+        iface.sync()
     idx = START_ID
     while idx < N_COLLECT:
-        reset_cloth(iface)
-        print(idx)
-        plug.turn_off()
-        iml, imr = get_rgb(zed)
-        # plt.imshow(iml); plt.show()
-        # plt.imshow(imr); plt.show()
-        ml, mr, iml_uv, imr_uv, imd = get_segmasks(zed, plug, color="green", plot=True)
-        # plt.imshow(img[:,:,0]); plt.show()
-
-        # action = input("Enter s to save image, q to discard image.")
-        # if action == 's':
-        print("WARNING, SAVING iMAGES DISABLED")
-        # Image.fromarray(iml_uv).save(osp.join(OUTPUT_DIR, "imagel_uv_%d.png" % idx))
-        # Image.fromarray(imr_uv).save(osp.join(OUTPUT_DIR, "imager_uv_%d.png" % idx))
-        # Image.fromarray(iml).save(osp.join(OUTPUT_DIR, "imagel_%d.png" % idx))
-        # Image.fromarray(imr).save(osp.join(OUTPUT_DIR, "imager_%d.png" % idx))
-        # np.save(osp.join(OUTPUT_DIR, "image_depth_%d.npy" % idx), imd)
-        # Image.fromarray(ml).save(osp.join(OUTPUT_DIR, "maskl_%d.png" % idx))
-        # Image.fromarray(mr).save(osp.join(OUTPUT_DIR, "maskr_%d.png" % idx))
+        if AUTOMATIC:
+            try:
+                reset_cloth(iface)
+            except Exception as e:
+                print(e)
+                iface.y = YuMi(l_tcp=iface.L_TCP, r_tcp=iface.R_TCP)
+                iface.open_grippers()
+                iface.home()
+                iface.sync()
+        else:
+            input("Enter to take a pic")
+        print(f"Taking image {idx}")
+        iml, imr = get_rgb(zed, RGB_EXP, RGB_GAIN)
+        ml, mr, iml_uv, imr_uv = get_segmasks(
+            zed, plug, COLOR_BOUNDS, UV_GAIN, UV_EXPS, plot=False, capture_fn=cap_fn
+        )
+        zed.set_exposure(RGB_EXP)
+        zed.set_exposure(RGB_GAIN)
+        writer = AsyncWrite(iml, imr, iml_uv, imr_uv, idx, OUTPUT_DIR)
+        writer.start()
         idx += 1
+        plt.close("all")
