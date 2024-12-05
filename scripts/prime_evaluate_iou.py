@@ -132,5 +132,5 @@ def plot_results(thresholds, avg_ious, std_ious):
     plt.show()
 
 # Example usage
-data_folder = "/home/lawrence/U-Net/prime_data"  # Replace with the path to your data folder
+data_folder = "/home/lawrence/U-Net/prime_data_split/val"  # Replace with the path to your data folder
 evaluate_iou(data_folder)

@@ -49,6 +49,6 @@ Step 2: Verify data is good. Use prime_data_verification.py. Use arrow keys to g
 
 Step 3: Split into training and testing data with prime_split_data.py
 
-Step 4: To train the model, run train.py
+Step 4: To train the model, run python3 scripts/train.py
 
-Step 5: To figure out how good the model is/what you should set the masking threshold to, run prime_evaluate_iou.py and pick the threshold with the highest mean IoU.
+Step 5: To figure out how good the model is/what you should set the masking threshold to, run python3 scripts/prime_evaluate_iou.py and pick the threshold with the highest mean IoU.
